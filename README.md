@@ -1,1 +1,34 @@
-fable-combinations-2019
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Flexible futures for fable functionality
+
+> Mitchell O’Hara-Wild (Monash University)
+
+> Rob Hyndman (Monash University)
+
+## Abstract
+
+The fable ecosystem provides a tidy interface for time series modelling
+and forecasting, leveraging the data structure from the tsibble package
+to support a more natural analysis of modern time series. fable is
+designed to forecast collections of related (possibly multivariate) time
+series, and to provide tools for working with multiple models. It
+emphasises density forecasting, whilst continuing to provide a simple
+user-interface for point forecasting.
+
+Existing implementations of time series models work well in isolation,
+however it has long-been known that ensembles of forecasts improve
+forecast accuracy. Hybrid forecasting (separately forecasting components
+of a time series) is another useful forecasting method. Both ensemble
+and hybrid forecasts can be expressed as forecast combinations. Recent
+enhancements to the fable framework now provide a flexible approach to
+easily combine and evaluate the forecasts from multiple models.
+
+The fable package is designed for extensibility, allowing for easier
+creation of new forecasting models and tools. Without any further
+implementation, extension models can leverage essential functionality
+including plotting, accuracy evaluation, model combination and
+diagnostics. This talk will feature recent developments to the fable
+framework for combining forecasts, and the performance gain will be
+evaluated using a set of related time series.
