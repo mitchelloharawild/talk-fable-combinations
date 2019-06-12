@@ -219,7 +219,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### Start with the data
 
@@ -241,7 +241,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### Estimate an ETS model
 
@@ -264,7 +264,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### Forecast three years ahead
 
@@ -288,7 +288,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### See the results!
 
