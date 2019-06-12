@@ -168,6 +168,9 @@ p, li {
   width: 100%;
 }
 
+.full-width p{
+  margin: 3px;
+}
 .table{
 	width: 100%;
 	text-align: center;

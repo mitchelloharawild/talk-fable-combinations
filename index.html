@@ -52,9 +52,9 @@ class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)]
 
-# Domestic tourism in Australia
+# Tidy temporal data structure
 
-### The tsibble data structure
+### Domestic tourism in Australia
 
 
 ```r
@@ -86,9 +86,9 @@ class: top
 
 .sticker-float[![feasts](resources/feasts.svg)]
 
-# Domestic tourism in Australia
+# A peak at the features
 
-### A peak at the features
+### Compute features relating to STL decompositions
 
 
 ```r
@@ -115,17 +115,17 @@ tourism_features &lt;- tourism %&gt;%
 #&gt; # … with 294 more rows
 ```
 
-
 ---
 
 class: top
 
 .sticker-float[![ggplot2](resources/ggplot2.svg)]
 
-# Domestic tourism in Australia
+# A peak at the features
 
-### A peak at the features
+### Plotting trend and seasonality
 
+.full-width[
 
 ```r
 library(ggplot2)
@@ -135,6 +135,7 @@ tourism_features %&gt;%
 ```
 
 &lt;img src="figure/tourism-features-plot-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
@@ -142,9 +143,9 @@ class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
 
-# Domestic tourism in Australia
+# Total trips across Australia
 
-### Compute quarterly trips across Australia
+### Starting from the top
 
 
 ```r
@@ -155,7 +156,6 @@ tourism_aus &lt;- tourism %&gt;%
 tourism_aus %&gt;% 
   autoplot(Trips)
 ```
-
 
 .flex-row[
 
