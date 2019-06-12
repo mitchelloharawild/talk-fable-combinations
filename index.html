@@ -413,7 +413,8 @@ holiday_aus %&gt;%
     ets_m = ETS(Trips ~ season("M")),
     arima = ARIMA(Trips)
   ) %&gt;% 
-* accuracy()
+* accuracy() %&gt;%
+* arrange(MASE)
 ```
 ]
 .right-plot[
@@ -422,10 +423,166 @@ holiday_aus %&gt;%
 #&gt; # A tibble: 3 x 9
 #&gt;   .model .type       ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
 #&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 ets_a  Training  53.5  428.  331. 0.349  3.45 0.799 -0.0640
-#&gt; 2 ets_m  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
+#&gt; 1 ets_m  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
+#&gt; 2 ets_a  Training  53.5  428.  331. 0.349  3.45 0.799 -0.0640
 #&gt; 3 arima  Training  57.0  468.  361. 0.445  3.79 0.871 -0.0528
 ```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+*   combn = (ets_a + ets_m + arima)/3
+  )
+```
+]
+.right-plot[
+
+```
+#&gt; # A mable: 1 x 4
+#&gt;   ets_a        ets_m        arima                    combn        
+#&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;      
+#&gt; 1 &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_a + ets_m + arima)/3
+  ) %&gt;% 
+* accuracy() %&gt;%
+* arrange(MASE)
+```
+]
+.right-plot[
+
+```
+#&gt; # A tibble: 4 x 9
+#&gt;   .model .type       ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
+#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 combn  Training  55.3  423.  320. 0.389  3.34 0.772 -0.0579
+#&gt; 2 ets_m  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
+#&gt; 3 ets_a  Training  53.5  428.  331. 0.349  3.45 0.799 -0.0640
+#&gt; 4 arima  Training  57.0  468.  361. 0.445  3.79 0.871 -0.0528
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_a + ets_m + arima)/3
+  ) %&gt;% 
+* select(combn) %&gt;%
+* forecast(h = "3 years")
+```
+]
+.right-plot[
+
+```
+#&gt; # A fable: 12 x 4 [1Q]
+#&gt; # Key:     .model [1]
+#&gt;    .model Quarter  Trips .distribution   
+#&gt;    &lt;chr&gt;    &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;          
+#&gt;  1 combn  2018 Q1 12904. N(12904, 293766)
+#&gt;  2 combn  2018 Q2 10862. N(10862, 257121)
+#&gt;  3 combn  2018 Q3 10558. N(10558, 265000)
+#&gt;  4 combn  2018 Q4 10837. N(10837, 290644)
+#&gt;  5 combn  2019 Q1 13020. N(13020, 434608)
+#&gt;  6 combn  2019 Q2 10957. N(10957, 382646)
+#&gt;  7 combn  2019 Q3 10655. N(10655, 389249)
+#&gt;  8 combn  2019 Q4 10923. N(10923, 418648)
+#&gt;  9 combn  2020 Q1 13093. N(13093, 591424)
+#&gt; 10 combn  2020 Q2 11048. N(11048, 523612)
+#&gt; 11 combn  2020 Q3 10745. N(10745, 529070)
+#&gt; 12 combn  2020 Q4 11028. N(11028, 562630)
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_a + ets_m + arima)/3
+  ) %&gt;% 
+  select(combn) %&gt;% 
+  forecast(h = "3 years") %&gt;% 
+* autoplot(holiday_aus)
+```
+]
+.right-plot[
+&lt;img src="figure/tourism-total-combn-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
