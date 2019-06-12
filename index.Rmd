@@ -171,14 +171,13 @@ class: top
 
 # A peak at the features
 
-### Plotting trend and seasonality
-
 .full-width[
 ```{r tourism-features-plot, echo = TRUE}
 library(ggplot2)
 tourism_features %>% 
   ggplot(aes(x = trend_strength, y = seasonal_strength_year, colour = Purpose)) + 
-  geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 3, geom = "polygon")
+  geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 5, geom = "polygon") + 
+  facet_wrap(vars(Purpose), nrow = 1) + coord_equal() + xlim(c(0,1)) + ylim(c(0,1))
 ```
 ]
 
