@@ -15,6 +15,23 @@ class: inverse
 
 
 
+
+&lt;style type="text/css"&gt;
+/* custom.css */
+.left-code {
+  color: #777;
+  width: 35%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 63%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
 .title[fable]
 .sticker-float[![fable](resources/fable.svg)]
 
@@ -179,6 +196,141 @@ tourism_aus %&gt;%
 &lt;img src="figure/tourism-total-plot-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 ]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### Start with the data
+
+&lt;br&gt;
+
+.left-code[
+
+```r
+*tourism_aus
+```
+]
+.right-plot[
+
+```
+#&gt; # A tsibble: 80 x 2 [1Q]
+#&gt;    Quarter  Trips
+#&gt;      &lt;qtr&gt;  &lt;dbl&gt;
+#&gt;  1 1998 Q1 23182.
+#&gt;  2 1998 Q2 20323.
+#&gt;  3 1998 Q3 19827.
+#&gt;  4 1998 Q4 20830.
+#&gt;  5 1999 Q1 22087.
+#&gt;  6 1999 Q2 21458.
+#&gt;  7 1999 Q3 19914.
+#&gt;  8 1999 Q4 20028.
+#&gt;  9 2000 Q1 22339.
+#&gt; 10 2000 Q2 19941.
+#&gt; # … with 70 more rows
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### Estimate an ETS model
+
+&lt;br&gt;
+
+.left-code[
+
+```r
+tourism_aus %&gt;% 
+* model(ETS(Trips))
+```
+]
+.right-plot[
+
+```
+#&gt; # A mable: 1 x 1
+#&gt;   `ETS(Trips)`
+#&gt;   &lt;model&gt;     
+#&gt; 1 &lt;ETS(A,A,A)&gt;
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### Forecast three years ahead
+
+&lt;br&gt;
+
+.left-code[
+
+```r
+tourism_aus %&gt;% 
+  model(ETS(Trips)) %&gt;% 
+* forecast(h = "3 years")
+```
+]
+.right-plot[
+
+```
+#&gt; # A fable: 12 x 4 [1Q]
+#&gt; # Key:     .model [1]
+#&gt;    .model     Quarter  Trips .distribution    
+#&gt;    &lt;chr&gt;        &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;           
+#&gt;  1 ETS(Trips) 2018 Q1 29068. N(29068,  699901)
+#&gt;  2 ETS(Trips) 2018 Q2 27794. N(27794,  870750)
+#&gt;  3 ETS(Trips) 2018 Q3 27619. N(27619, 1073763)
+#&gt;  4 ETS(Trips) 2018 Q4 28627. N(28627, 1311711)
+#&gt;  5 ETS(Trips) 2019 Q1 30336. N(30336, 1587455)
+#&gt;  6 ETS(Trips) 2019 Q2 29062. N(29062, 1903591)
+#&gt;  7 ETS(Trips) 2019 Q3 28887. N(28887, 2262980)
+#&gt;  8 ETS(Trips) 2019 Q4 29895. N(29895, 2668392)
+#&gt;  9 ETS(Trips) 2020 Q1 31604. N(31604, 3122715)
+#&gt; 10 ETS(Trips) 2020 Q2 30330. N(30330, 3628493)
+#&gt; 11 ETS(Trips) 2020 Q3 30155. N(30155, 4188612)
+#&gt; 12 ETS(Trips) 2020 Q4 31163. N(31163, 4805844)
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### See the results!
+
+&lt;br&gt;
+
+.left-code[
+
+```r
+tourism_aus %&gt;% 
+  model(ETS(Trips)) %&gt;% 
+  forecast(h = "3 years") %&gt;% 
+* autoplot(tourism_aus)
+```
+]
+.right-plot[
+&lt;img src="figure/tourism-total-ets-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
 ---
 
 class: inverse, top

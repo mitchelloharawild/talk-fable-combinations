@@ -80,6 +80,23 @@ theme_set(
 )
 ```
 
+
+```{css, echo=FALSE}
+/* custom.css */
+.left-code {
+  color: #777;
+  width: 35%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 63%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+
 .title[fable]
 .sticker-float[![fable](resources/fable.svg)]
 
@@ -117,9 +134,9 @@ class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)]
 
-# Domestic tourism in Australia
+# Tidy temporal data structure
 
-### The tsibble data structure
+### Domestic tourism in Australia
 
 ```{r tourism-data, echo = TRUE}
 library(tsibble)
@@ -132,9 +149,9 @@ class: top
 
 .sticker-float[![feasts](resources/feasts.svg)]
 
-# Domestic tourism in Australia
+# A peak at the features
 
-### A peak at the features
+### Compute features relating to STL decompositions
 
 ```{r tourism-features, echo = TRUE}
 library(feasts)
@@ -146,23 +163,24 @@ tourism_features <- tourism %>%
 tourism_features
 ```
 
-
 ---
 
 class: top
 
 .sticker-float[![ggplot2](resources/ggplot2.svg)]
 
-# Domestic tourism in Australia
+# A peak at the features
 
-### A peak at the features
+### Plotting trend and seasonality
 
+.full-width[
 ```{r tourism-features-plot, echo = TRUE}
 library(ggplot2)
 tourism_features %>% 
   ggplot(aes(x = trend_strength, y = seasonal_strength_year, colour = Purpose)) + 
   geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 3, geom = "polygon")
 ```
+]
 
 ---
 
@@ -170,9 +188,9 @@ class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
 
-# Domestic tourism in Australia
+# Total trips across Australia
 
-### Compute quarterly trips across Australia
+### Starting from the top
 
 ```{r tourism-total, echo = TRUE, fig.show='hide'}
 library(dplyr)
@@ -182,7 +200,6 @@ tourism_aus <- tourism %>%
 tourism_aus %>% 
   autoplot(Trips)
 ```
-
 
 .flex-row[
 ```{r tourism-total-print, echo = FALSE}
@@ -195,6 +212,101 @@ tourism_aus %>%
 ```
 ]
 ]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### Start with the data
+
+<br>
+
+.left-code[
+```{r tourism-total-ets-data, eval=FALSE, echo=TRUE}
+tourism_aus #<<
+```
+]
+.right-plot[
+```{r tourism-total-ets-data-output, ref.label="tourism-total-ets-data", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### Estimate an ETS model
+
+<br>
+
+.left-code[
+```{r tourism-total-ets-model, eval=FALSE, echo=TRUE}
+tourism_aus %>% 
+  model(ETS(Trips)) #<<
+```
+]
+.right-plot[
+```{r tourism-total-ets-model-output, ref.label="tourism-total-ets-model", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### Forecast three years ahead
+
+<br>
+
+.left-code[
+```{r tourism-total-ets-forecast, eval=FALSE, echo=TRUE}
+tourism_aus %>% 
+  model(ETS(Trips)) %>% 
+  forecast(h = "3 years") #<<
+```
+]
+.right-plot[
+```{r tourism-total-ets-forecast-output, ref.label="tourism-total-ets-forecast", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with ETS
+
+### See the results!
+
+<br>
+
+.left-code[
+```{r tourism-total-ets-plot, eval=FALSE, echo=TRUE}
+tourism_aus %>% 
+  model(ETS(Trips)) %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(tourism_aus) #<<
+```
+]
+.right-plot[
+```{r tourism-total-ets-plot-output, ref.label="tourism-total-ets-plot", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
 ---
 
 class: inverse, top
