@@ -113,6 +113,90 @@ Outline talk structure, a bit on tsibble, mostly about fable, and a bit on feast
 
 ---
 
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)]
+
+# Domestic tourism in Australia
+
+### The tsibble data structure
+
+```{r tourism-data, echo = TRUE}
+library(tsibble)
+tourism
+```
+
+---
+
+class: top
+
+.sticker-float[![feasts](resources/feasts.svg)]
+
+# Domestic tourism in Australia
+
+### A peak at the features
+
+```{r tourism-features, echo = TRUE}
+library(feasts)
+tourism_features <- tourism %>% 
+  features(Trips, feature_set(tags = "stl"))
+```
+
+```{r tourism-features-print, echo = FALSE}
+tourism_features
+```
+
+
+---
+
+class: top
+
+.sticker-float[![ggplot2](resources/ggplot2.svg)]
+
+# Domestic tourism in Australia
+
+### A peak at the features
+
+```{r tourism-features-plot, echo = TRUE}
+library(ggplot2)
+tourism_features %>% 
+  ggplot(aes(x = trend_strength, y = seasonal_strength_year, colour = Purpose)) + 
+  geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 3, geom = "polygon")
+```
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
+
+# Domestic tourism in Australia
+
+### Compute quarterly trips across Australia
+
+```{r tourism-total, echo = TRUE, fig.show='hide'}
+library(dplyr)
+tourism_aus <- tourism %>% 
+  summarise(Trips = sum(Trips))
+
+tourism_aus %>% 
+  autoplot(Trips)
+```
+
+
+.flex-row[
+```{r tourism-total-print, echo = FALSE}
+tourism_aus
+```
+.full-width[
+```{r tourism-total-plot, echo = FALSE}
+tourism_aus %>% 
+  autoplot(Trips)
+```
+]
+]
+---
+
 class: inverse, top
 
 .sticker-float[![fable](resources/fable.svg)]
