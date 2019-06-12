@@ -307,6 +307,89 @@ holiday_aus %>%
 ```
 ]
 
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Many models for mable
+
+### Estimate multiple models
+
+<br>
+.left-code[
+```{r tourism-total-many-mdls, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  model(
+    ets_a = ETS(Trips ~ season("A")), #<<
+    ets_m = ETS(Trips ~ season("M")), #<<
+    arima = ARIMA(Trips) #<<
+  )
+```
+]
+.right-plot[
+```{r tourism-total-many-mdls-output, ref.label="tourism-total-many-mdls", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Many models for mable
+
+### Forecasts from multiple models
+
+<br>
+.left-code[
+```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  forecast(h = "3 years") %>% #<<
+  autoplot(holiday_aus, level = NULL) #<<
+```
+]
+.right-plot[
+```{r tourism-total-many-plot-output, ref.label="tourism-total-many-plot", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Many models for mable
+
+### Compare model performance
+
+<br>
+.left-code[
+```{r tourism-total-many-acc, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  accuracy() #<<
+```
+]
+.right-plot[
+```{r tourism-total-many-acc-output, ref.label="tourism-total-many-acc", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
 ---
 
 class: inverse, top

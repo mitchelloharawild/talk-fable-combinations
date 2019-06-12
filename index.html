@@ -20,12 +20,12 @@ class: inverse
 /* custom.css */
 .left-code {
   color: #777;
-  width: 35%;
+  width: 40%;
   height: 92%;
   float: left;
 }
 .right-plot {
-  width: 63%;
+  width: 58%;
   float: right;
   padding-left: 1%;
 }
@@ -140,15 +140,14 @@ class: top
 
 # A peak at the features
 
-### Plotting trend and seasonality
-
 .full-width[
 
 ```r
 library(ggplot2)
 tourism_features %&gt;% 
   ggplot(aes(x = trend_strength, y = seasonal_strength_year, colour = Purpose)) + 
-  geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 3, geom = "polygon")
+  geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 5, geom = "polygon") + 
+  facet_wrap(vars(Purpose), nrow = 1) + coord_equal() + xlim(c(0,1)) + ylim(c(0,1))
 ```
 
 &lt;img src="figure/tourism-features-plot-1.svg" style="display: block; margin: auto;" /&gt;
@@ -160,17 +159,18 @@ class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
 
-# Total trips across Australia
+# Total holidays across Australia
 
 ### Starting from the top
 
 
 ```r
 library(dplyr)
-tourism_aus &lt;- tourism %&gt;% 
+holiday_aus &lt;- tourism %&gt;% 
+  filter(Purpose == "Holiday") %&gt;% 
   summarise(Trips = sum(Trips))
 
-tourism_aus %&gt;% 
+holiday_aus %&gt;% 
   autoplot(Trips)
 ```
 
@@ -180,16 +180,16 @@ tourism_aus %&gt;%
 #&gt; # A tsibble: 80 x 2 [1Q]
 #&gt;    Quarter  Trips
 #&gt;      &lt;qtr&gt;  &lt;dbl&gt;
-#&gt;  1 1998 Q1 23182.
-#&gt;  2 1998 Q2 20323.
-#&gt;  3 1998 Q3 19827.
-#&gt;  4 1998 Q4 20830.
-#&gt;  5 1999 Q1 22087.
-#&gt;  6 1999 Q2 21458.
-#&gt;  7 1999 Q3 19914.
-#&gt;  8 1999 Q4 20028.
-#&gt;  9 2000 Q1 22339.
-#&gt; 10 2000 Q2 19941.
+#&gt;  1 1998 Q1 11806.
+#&gt;  2 1998 Q2  9276.
+#&gt;  3 1998 Q3  8642.
+#&gt;  4 1998 Q4  9300.
+#&gt;  5 1999 Q1 11172.
+#&gt;  6 1999 Q2  9608.
+#&gt;  7 1999 Q3  8914.
+#&gt;  8 1999 Q4  9026.
+#&gt;  9 2000 Q1 11071.
+#&gt; 10 2000 Q2  9196.
 #&gt; # … with 70 more rows
 ```
 .full-width[
@@ -203,7 +203,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### Start with the data
 
@@ -212,7 +212,7 @@ class: top
 .left-code[
 
 ```r
-*tourism_aus
+*holiday_aus
 ```
 ]
 .right-plot[
@@ -221,16 +221,16 @@ class: top
 #&gt; # A tsibble: 80 x 2 [1Q]
 #&gt;    Quarter  Trips
 #&gt;      &lt;qtr&gt;  &lt;dbl&gt;
-#&gt;  1 1998 Q1 23182.
-#&gt;  2 1998 Q2 20323.
-#&gt;  3 1998 Q3 19827.
-#&gt;  4 1998 Q4 20830.
-#&gt;  5 1999 Q1 22087.
-#&gt;  6 1999 Q2 21458.
-#&gt;  7 1999 Q3 19914.
-#&gt;  8 1999 Q4 20028.
-#&gt;  9 2000 Q1 22339.
-#&gt; 10 2000 Q2 19941.
+#&gt;  1 1998 Q1 11806.
+#&gt;  2 1998 Q2  9276.
+#&gt;  3 1998 Q3  8642.
+#&gt;  4 1998 Q4  9300.
+#&gt;  5 1999 Q1 11172.
+#&gt;  6 1999 Q2  9608.
+#&gt;  7 1999 Q3  8914.
+#&gt;  8 1999 Q4  9026.
+#&gt;  9 2000 Q1 11071.
+#&gt; 10 2000 Q2  9196.
 #&gt; # … with 70 more rows
 ```
 ]
@@ -241,7 +241,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### Estimate an ETS model
 
@@ -250,7 +250,7 @@ class: top
 .left-code[
 
 ```r
-tourism_aus %&gt;% 
+holiday_aus %&gt;% 
 * model(ETS(Trips))
 ```
 ]
@@ -260,7 +260,7 @@ tourism_aus %&gt;%
 #&gt; # A mable: 1 x 1
 #&gt;   `ETS(Trips)`
 #&gt;   &lt;model&gt;     
-#&gt; 1 &lt;ETS(A,A,A)&gt;
+#&gt; 1 &lt;ETS(M,N,M)&gt;
 ```
 ]
 
@@ -270,7 +270,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### Forecast three years ahead
 
@@ -279,7 +279,7 @@ class: top
 .left-code[
 
 ```r
-tourism_aus %&gt;% 
+holiday_aus %&gt;% 
   model(ETS(Trips)) %&gt;% 
 * forecast(h = "3 years")
 ```
@@ -289,20 +289,20 @@ tourism_aus %&gt;%
 ```
 #&gt; # A fable: 12 x 4 [1Q]
 #&gt; # Key:     .model [1]
-#&gt;    .model     Quarter  Trips .distribution    
-#&gt;    &lt;chr&gt;        &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;           
-#&gt;  1 ETS(Trips) 2018 Q1 29068. N(29068,  699901)
-#&gt;  2 ETS(Trips) 2018 Q2 27794. N(27794,  870750)
-#&gt;  3 ETS(Trips) 2018 Q3 27619. N(27619, 1073763)
-#&gt;  4 ETS(Trips) 2018 Q4 28627. N(28627, 1311711)
-#&gt;  5 ETS(Trips) 2019 Q1 30336. N(30336, 1587455)
-#&gt;  6 ETS(Trips) 2019 Q2 29062. N(29062, 1903591)
-#&gt;  7 ETS(Trips) 2019 Q3 28887. N(28887, 2262980)
-#&gt;  8 ETS(Trips) 2019 Q4 29895. N(29895, 2668392)
-#&gt;  9 ETS(Trips) 2020 Q1 31604. N(31604, 3122715)
-#&gt; 10 ETS(Trips) 2020 Q2 30330. N(30330, 3628493)
-#&gt; 11 ETS(Trips) 2020 Q3 30155. N(30155, 4188612)
-#&gt; 12 ETS(Trips) 2020 Q4 31163. N(31163, 4805844)
+#&gt;    .model     Quarter  Trips .distribution   
+#&gt;    &lt;chr&gt;        &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;          
+#&gt;  1 ETS(Trips) 2018 Q1 13088. N(13088, 368663)
+#&gt;  2 ETS(Trips) 2018 Q2 10909. N(10909, 288993)
+#&gt;  3 ETS(Trips) 2018 Q3 10442. N(10442, 294873)
+#&gt;  4 ETS(Trips) 2018 Q4 10624. N(10624, 336446)
+#&gt;  5 ETS(Trips) 2019 Q1 13088. N(13088, 558216)
+#&gt;  6 ETS(Trips) 2019 Q2 10909. N(10909, 420721)
+#&gt;  7 ETS(Trips) 2019 Q3 10442. N(10442, 415586)
+#&gt;  8 ETS(Trips) 2019 Q4 10624. N(10624, 461447)
+#&gt;  9 ETS(Trips) 2020 Q1 13088. N(13088, 747978)
+#&gt; 10 ETS(Trips) 2020 Q2 10909. N(10909, 552594)
+#&gt; 11 ETS(Trips) 2020 Q3 10442. N(10442, 536433)
+#&gt; 12 ETS(Trips) 2020 Q4 10624. N(10624, 586585)
 ```
 ]
 
@@ -312,7 +312,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Forecasting with ETS
+# Forecasting with fable
 
 ### See the results!
 
@@ -321,14 +321,111 @@ class: top
 .left-code[
 
 ```r
-tourism_aus %&gt;% 
+holiday_aus %&gt;% 
   model(ETS(Trips)) %&gt;% 
   forecast(h = "3 years") %&gt;% 
-* autoplot(tourism_aus)
+* autoplot(holiday_aus)
 ```
 ]
 .right-plot[
 &lt;img src="figure/tourism-total-ets-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Many models for mable
+
+### Estimate multiple models
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+*   ets_a = ETS(Trips ~ season("A")),
+*   ets_m = ETS(Trips ~ season("M")),
+*   arima = ARIMA(Trips)
+  )
+```
+]
+.right-plot[
+
+```
+#&gt; # A mable: 1 x 3
+#&gt;   ets_a        ets_m        arima                   
+#&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                 
+#&gt; 1 &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;
+```
+]
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Many models for mable
+
+### Forecasts from multiple models
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+* forecast(h = "3 years") %&gt;%
+* autoplot(holiday_aus, level = NULL)
+```
+]
+.right-plot[
+&lt;img src="figure/tourism-total-many-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Many models for mable
+
+### Compare model performance
+
+&lt;br&gt;
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+* accuracy()
+```
+]
+.right-plot[
+
+```
+#&gt; # A tibble: 3 x 9
+#&gt;   .model .type       ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
+#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 ets_a  Training  53.5  428.  331. 0.349  3.45 0.799 -0.0640
+#&gt; 2 ets_m  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
+#&gt; 3 arima  Training  57.0  468.  361. 0.445  3.79 0.871 -0.0528
+```
 ]
 
 ---
