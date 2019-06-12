@@ -85,12 +85,12 @@ theme_set(
 /* custom.css */
 .left-code {
   color: #777;
-  width: 35%;
+  width: 40%;
   height: 92%;
   float: left;
 }
 .right-plot {
-  width: 63%;
+  width: 58%;
   float: right;
   padding-left: 1%;
 }
@@ -187,26 +187,27 @@ class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
 
-# Total trips across Australia
+# Total holidays across Australia
 
 ### Starting from the top
 
 ```{r tourism-total, echo = TRUE, fig.show='hide'}
 library(dplyr)
-tourism_aus <- tourism %>% 
+holiday_aus <- tourism %>% 
+  filter(Purpose == "Holiday") %>% 
   summarise(Trips = sum(Trips))
 
-tourism_aus %>% 
+holiday_aus %>% 
   autoplot(Trips)
 ```
 
 .flex-row[
 ```{r tourism-total-print, echo = FALSE}
-tourism_aus
+holiday_aus
 ```
 .full-width[
 ```{r tourism-total-plot, echo = FALSE}
-tourism_aus %>% 
+holiday_aus %>% 
   autoplot(Trips)
 ```
 ]
@@ -226,7 +227,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-data, eval=FALSE, echo=TRUE}
-tourism_aus #<<
+holiday_aus #<<
 ```
 ]
 .right-plot[
@@ -248,7 +249,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-model, eval=FALSE, echo=TRUE}
-tourism_aus %>% 
+holiday_aus %>% 
   model(ETS(Trips)) #<<
 ```
 ]
@@ -271,7 +272,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-forecast, eval=FALSE, echo=TRUE}
-tourism_aus %>% 
+holiday_aus %>% 
   model(ETS(Trips)) %>% 
   forecast(h = "3 years") #<<
 ```
@@ -295,10 +296,10 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-plot, eval=FALSE, echo=TRUE}
-tourism_aus %>% 
+holiday_aus %>% 
   model(ETS(Trips)) %>% 
   forecast(h = "3 years") %>% 
-  autoplot(tourism_aus) #<<
+  autoplot(holiday_aus) #<<
 ```
 ]
 .right-plot[
