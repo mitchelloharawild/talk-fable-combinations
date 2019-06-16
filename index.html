@@ -356,9 +356,8 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Accuracy evaluation
+# Forecast accuracy evaluation
 
-### Methods
 
 - Trai
 
@@ -369,7 +368,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Many models for mable
+# Comparing multiple models
 
 ### Estimate multiple models
 
@@ -379,8 +378,8 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-*   ets_a = ETS(Trips ~ season("A")),
-*   ets_m = ETS(Trips ~ season("M")),
+*   ets_n = ETS(Trips ~ trend("N")),
+*   ets_a = ETS(Trips ~ trend("A")),
 *   arima = ARIMA(Trips)
   )
 ```
@@ -389,9 +388,9 @@ holiday_aus %&gt;%
 
 ```
 #&gt; # A mable: 1 x 3
-#&gt;   ets_a        ets_m        arima                   
+#&gt;   ets_n        ets_a        arima                   
 #&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                 
-#&gt; 1 &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;
+#&gt; 1 &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;
 ```
 ]
 
@@ -401,7 +400,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Many models for mable
+# Comparing multiple models
 
 ### Forecasts from multiple models
 
@@ -411,8 +410,8 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
 * forecast(h = "3 years") %&gt;%
@@ -430,7 +429,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Many models for mable
+# Comparing multiple models
 
 ### Compare model performance
 
@@ -440,8 +439,8 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
 * accuracy() %&gt;%
@@ -454,9 +453,9 @@ holiday_aus %&gt;%
 #&gt; # A tibble: 3 x 9
 #&gt;   .model .type       ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
 #&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 ets_m  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
-#&gt; 2 ets_a  Training  53.5  428.  331. 0.349  3.45 0.799 -0.0640
-#&gt; 3 arima  Training  57.0  468.  361. 0.445  3.79 0.871 -0.0528
+#&gt; 1 ets_a  Training  77.3  414.  312. 0.644  3.26 0.753  0.0268
+#&gt; 2 ets_n  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
+#&gt; 3 arima  Training  89.5  443.  328. 0.781  3.43 0.791 -0.0996
 ```
 ]
 
@@ -485,12 +484,12 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-*   combn = (ets_a + ets_m + arima)/3
+*   combn = (ets_n + ets_a + arima)/3
   )
 ```
 ]
@@ -498,9 +497,9 @@ holiday_aus %&gt;%
 
 ```
 #&gt; # A mable: 1 x 4
-#&gt;   ets_a        ets_m        arima                    combn        
+#&gt;   ets_n        ets_a        arima                    combn        
 #&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;      
-#&gt; 1 &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt; 1 &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
 ```
 ]
 
@@ -520,12 +519,12 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   ) %&gt;% 
 * accuracy() %&gt;%
 * arrange(MASE)
@@ -537,10 +536,10 @@ holiday_aus %&gt;%
 #&gt; # A tibble: 4 x 9
 #&gt;   .model .type       ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
 #&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 combn  Training  66.2  425.  323. 0.501  3.36 0.778 -0.0768
-#&gt; 2 ets_m  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
-#&gt; 3 arima  Training  89.5  443.  328. 0.781  3.43 0.791 -0.0996
-#&gt; 4 ets_a  Training  53.5  428.  331. 0.349  3.45 0.799 -0.0640
+#&gt; 1 ets_a  Training  77.3  414.  312. 0.644  3.26 0.753  0.0268
+#&gt; 2 combn  Training  74.1  419.  314. 0.600  3.29 0.759 -0.0545
+#&gt; 3 ets_n  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
+#&gt; 4 arima  Training  89.5  443.  328. 0.781  3.43 0.791 -0.0996
 ```
 ]
 
@@ -560,12 +559,12 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   ) %&gt;% 
 * select(combn) %&gt;%
 * forecast(h = "3 years")
@@ -578,18 +577,18 @@ holiday_aus %&gt;%
 #&gt; # Key:     .model [1]
 #&gt;    .model Quarter  Trips .distribution   
 #&gt;    &lt;chr&gt;    &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;          
-#&gt;  1 combn  2018 Q1 12904. N(12904, 293766)
-#&gt;  2 combn  2018 Q2 10862. N(10862, 257121)
-#&gt;  3 combn  2018 Q3 10558. N(10558, 265000)
-#&gt;  4 combn  2018 Q4 10837. N(10837, 290644)
-#&gt;  5 combn  2019 Q1 13020. N(13020, 434608)
-#&gt;  6 combn  2019 Q2 10957. N(10957, 382646)
-#&gt;  7 combn  2019 Q3 10655. N(10655, 389249)
-#&gt;  8 combn  2019 Q4 10923. N(10923, 418648)
-#&gt;  9 combn  2020 Q1 13093. N(13093, 591424)
-#&gt; 10 combn  2020 Q2 11048. N(11048, 523612)
-#&gt; 11 combn  2020 Q3 10745. N(10745, 529070)
-#&gt; 12 combn  2020 Q4 11028. N(11028, 562630)
+#&gt;  1 combn  2018 Q1 13072. N(13072, 302312)
+#&gt;  2 combn  2018 Q2 11032. N(11032, 256076)
+#&gt;  3 combn  2018 Q3 10651. N(10651, 262519)
+#&gt;  4 combn  2018 Q4 10926. N(10926, 292411)
+#&gt;  5 combn  2019 Q1 13349. N(13349, 439106)
+#&gt;  6 combn  2019 Q2 11278. N(11278, 370208)
+#&gt;  7 combn  2019 Q3 10890. N(10890, 377655)
+#&gt;  8 combn  2019 Q4 11167. N(11167, 418594)
+#&gt;  9 combn  2020 Q1 13626. N(13626, 620471)
+#&gt; 10 combn  2020 Q2 11524. N(11524, 521640)
+#&gt; 11 combn  2020 Q3 11129. N(11129, 530074)
+#&gt; 12 combn  2020 Q4 11409. N(11409, 585096)
 ```
 ]
 
@@ -609,12 +608,12 @@ class: top
 ```r
 holiday_aus %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ season("A")),
+    ets_a = ETS(Trips ~ season("M")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   ) %&gt;% 
   select(combn) %&gt;% 
   forecast(h = "3 years") %&gt;% 
@@ -697,30 +696,30 @@ library(future)
 plan(multiprocess)
 fit &lt;- tourism_agg %&gt;% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   )
 ```
 
 ```
 #&gt; # A mable: 425 x 7
 #&gt; # Key:     State, Region, Purpose [425]
-#&gt;    State   Region  Purpose  ets_a        ets_m        arima                    combn        
+#&gt;    State   Region  Purpose  ets_n        ets_a        arima                    combn        
 #&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;      
-#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(A,A,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(A,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)&gt;           &lt;COMBINATION&gt;
-#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(1,0,1)[4]&gt; &lt;COMBINATION&gt;
-#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)&gt;           &lt;COMBINATION&gt;
-#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(A,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;   &lt;COMBINATION&gt;
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,A)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,1,1)&gt;           &lt;COMBINATION&gt;
+#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(A,A,N)&gt; &lt;ARIMA(0,1,1)(1,0,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(M,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,1,1)&gt;           &lt;COMBINATION&gt;
+#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(M,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;   &lt;COMBINATION&gt;
 #&gt; # … with 415 more rows
 ```
 
@@ -739,18 +738,18 @@ tourism_accuracy
 
 ```
 #&gt; # A tibble: 1,700 x 12
-#&gt;    State   Region  Purpose  .model .type        ME  RMSE   MAE      MPE  MAPE  MASE     ACF1
-#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  ets_a  Training 105.   794.  604.    0.379   2.86 0.636 -0.00151
-#&gt;  2 &lt;total&gt; &lt;total&gt; Business ets_a  Training  39.7  288.  221.    0.468   5.39 0.728 -0.00902
-#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  ets_a  Training  53.5  428.  331.    0.349   3.45 0.799 -0.0640 
-#&gt;  4 &lt;total&gt; &lt;total&gt; Other    ets_a  Training  13.9  102.   82.1   0.435   8.76 0.713 -0.0594 
-#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting ets_a  Training  51.2  348.  266.    0.488   3.83 0.657 -0.0450 
-#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  ets_a  Training   8.44  63.9  52.0   0.0884 10.2  0.752  0.0112 
-#&gt;  7 ACT     &lt;total&gt; Business ets_a  Training   4.28  32.7  26.7  -1.99   18.6  0.701  0.0388 
-#&gt;  8 ACT     &lt;total&gt; Holiday  ets_a  Training   3.63  38.9  28.5  -2.00   18.6  0.839  0.110  
-#&gt;  9 ACT     &lt;total&gt; Other    ets_a  Training   1.31  12.4  10.2 -16.1    42.9  0.792  0.0477 
-#&gt; 10 ACT     &lt;total&gt; Visiting ets_a  Training   2.91  30.1  21.9  -0.686  11.5  0.647  0.0892 
+#&gt;    State   Region  Purpose  .model .type        ME  RMSE   MAE     MPE  MAPE  MASE     ACF1
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  ets_n  Training 138.   821.  646.    0.464  3.01 0.681 -0.0510 
+#&gt;  2 &lt;total&gt; &lt;total&gt; Business ets_n  Training  39.7  288.  221.    0.468  5.39 0.728 -0.00902
+#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  ets_n  Training  55.5  427.  327.    0.374  3.41 0.789 -0.0578 
+#&gt;  4 &lt;total&gt; &lt;total&gt; Other    ets_n  Training  13.9  102.   82.1   0.435  8.76 0.713 -0.0594 
+#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting ets_n  Training  50.9  338.  263.    0.484  3.78 0.649 -0.0598 
+#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  ets_n  Training   9.54  64.1  50.8   0.290  9.97 0.734 -0.00730
+#&gt;  7 ACT     &lt;total&gt; Business ets_n  Training   4.90  32.7  26.7  -1.52  18.6  0.703  0.0312 
+#&gt;  8 ACT     &lt;total&gt; Holiday  ets_n  Training   3.63  38.9  28.5  -2.00  18.6  0.839  0.110  
+#&gt;  9 ACT     &lt;total&gt; Other    ets_n  Training   1.32  12.4  10.2 -16.0   42.6  0.789  0.0614 
+#&gt; 10 ACT     &lt;total&gt; Visiting ets_n  Training   3.28  31.1  23.2  -0.622 12.2  0.684  0.0737 
 #&gt; # … with 1,690 more rows
 ```
 
@@ -772,9 +771,9 @@ tourism_accuracy %&gt;%
 #&gt; # A tibble: 4 x 3
 #&gt;   .model `mean(MASE)` `median(MASE)`
 #&gt;   &lt;chr&gt;         &lt;dbl&gt;          &lt;dbl&gt;
-#&gt; 1 combn         0.745          0.733
-#&gt; 2 ets_a         0.757          0.742
-#&gt; 3 ets_m         0.760          0.746
+#&gt; 1 combn         0.739          0.737
+#&gt; 2 ets_n         0.751          0.747
+#&gt; 3 ets_a         0.753          0.748
 #&gt; 4 arima         0.766          0.765
 ```
 

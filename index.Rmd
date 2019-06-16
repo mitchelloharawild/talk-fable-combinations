@@ -353,8 +353,8 @@ class: top
 ```{r tourism-total-many-mdls, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")), #<<
-    ets_m = ETS(Trips ~ season("M")), #<<
+    ets_n = ETS(Trips ~ trend("N")), #<<
+    ets_a = ETS(Trips ~ trend("A")), #<<
     arima = ARIMA(Trips) #<<
   )
 ```
@@ -379,8 +379,8 @@ class: top
 ```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   forecast(h = "3 years") %>% #<<
@@ -408,8 +408,8 @@ class: top
 ```{r tourism-total-many-acc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   accuracy() %>% #<<
@@ -445,12 +445,12 @@ class: top
 ```{r tourism-total-combn, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3 #<<
+    combn = (ets_n + ets_a + arima)/3 #<<
   )
 ```
 ]
@@ -474,12 +474,12 @@ class: top
 ```{r tourism-total-combn-acc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   ) %>% 
   accuracy() %>% #<<
   arrange(MASE) #<<
@@ -505,12 +505,12 @@ class: top
 ```{r tourism-total-combn-fc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   ) %>% 
   select(combn) %>% #<<
   forecast(h = "3 years") #<<
@@ -536,12 +536,12 @@ class: top
 ```{r tourism-total-combn-plot, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ season("A")),
+    ets_a = ETS(Trips ~ season("M")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   ) %>% 
   select(combn) %>% 
   forecast(h = "3 years") %>% 
@@ -588,13 +588,14 @@ tourism_agg
 library(future)
 plan(multiprocess)
 fit <- tourism_agg %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
-    ets_a = ETS(Trips ~ season("A")),
-    ets_m = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_a + ets_m + arima)/3
+    combn = (ets_n + ets_a + arima)/3
   )
 ```
 ```{r tourism-agg-mdl-print, echo = FALSE}
