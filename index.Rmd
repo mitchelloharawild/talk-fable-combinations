@@ -226,7 +226,7 @@ class: top
 
 # Forecasting with fable
 
-### Start with the data
+### Look at the data
 
 <br>
 
@@ -248,7 +248,7 @@ class: top
 
 # Forecasting with fable
 
-### Estimate an ETS model
+### Specify and estimate a model
 
 <br>
 
@@ -271,7 +271,7 @@ class: top
 
 # Forecasting with fable
 
-### Forecast three years ahead
+### Make some forecasts
 
 <br>
 
@@ -315,11 +315,36 @@ holiday_aus %>%
 
 ---
 
+class: top, inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+<br>
+
+## It's easy to make forecasts...
+
+<br>
+
+# But are they good forecasts?
+
+---
 class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Many models for mable
+# Forecast accuracy evaluation
+
+
+- Trai
+
+### Measures
+
+---
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Comparing multiple models
 
 ### Estimate multiple models
 
@@ -345,7 +370,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Many models for mable
+# Comparing multiple models
 
 ### Forecasts from multiple models
 
@@ -374,7 +399,7 @@ class: top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Many models for mable
+# Comparing multiple models
 
 ### Compare model performance
 
@@ -572,6 +597,10 @@ fit <- tourism_agg %>%
     combn = (ets_a + ets_m + arima)/3
   )
 ```
+```{r tourism-agg-mdl-print, echo = FALSE}
+fit
+```
+
 
 ---
 

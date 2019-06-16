@@ -210,7 +210,7 @@ class: top
 
 # Forecasting with fable
 
-### Start with the data
+### Look at the data
 
 &lt;br&gt;
 
@@ -248,7 +248,7 @@ class: top
 
 # Forecasting with fable
 
-### Estimate an ETS model
+### Specify and estimate a model
 
 &lt;br&gt;
 
@@ -277,7 +277,7 @@ class: top
 
 # Forecasting with fable
 
-### Forecast three years ahead
+### Make some forecasts
 
 &lt;br&gt;
 
@@ -339,6 +339,32 @@ holiday_aus %&gt;%
 
 ---
 
+class: top, inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+&lt;br&gt;
+
+## It's easy to make forecasts...
+
+&lt;br&gt;
+
+# But are they good forecasts?
+
+---
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Accuracy evaluation
+
+### Methods
+
+- Trai
+
+### Measures
+
+---
 class: top
 
 .sticker-float[![fable](resources/fable.svg)]
@@ -679,6 +705,25 @@ fit &lt;- tourism_agg %&gt;%
     combn = (ets_a + ets_m + arima)/3
   )
 ```
+
+```
+#&gt; # A mable: 425 x 7
+#&gt; # Key:     State, Region, Purpose [425]
+#&gt;    State   Region  Purpose  ets_a        ets_m        arima                    combn        
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;      
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(A,A,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(A,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)&gt;           &lt;COMBINATION&gt;
+#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(1,0,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)&gt;           &lt;COMBINATION&gt;
+#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(A,N,A)&gt; &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;   &lt;COMBINATION&gt;
+#&gt; # … with 415 more rows
+```
+
 
 ---
 
