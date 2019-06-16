@@ -106,7 +106,7 @@ theme_set(
 ### Mitchell O'Hara-Wild (`r fa("twitter", fill="#1da1f2")`[@mitchoharawild](https://twitter.com/mitchoharawild))
 ### Rob Hyndman (`r fa("twitter", fill="#1da1f2")`[@robjhyndman](https://twitter.com/robjhyndman/))
 ### 19 June 2019
-### Slides @ [mitchelloharawild.com/isf2019](https://mitchelloharawild.com/isf2019)
+### Slides @ [slides.mitchelloharawild.com/isf2019](https://slides.mitchelloharawild.com/isf2019)
 ]
 
 ---
@@ -529,7 +529,7 @@ class: inverse, top
 
 `r fa("chart-line", fill = "white")` Keep updated: [tidyverts.org](http://www.tidyverts.org)
 
-`r fa("desktop", fill = "white")` Review slides: [mitchelloharawild.com/isf2019](https://mitchelloharawild.com/isf2019)
+`r fa("desktop", fill = "white")` Review slides: [slides.mitchelloharawild.com/isf2019](https://slides.mitchelloharawild.com/isf2019)
 
 <br>
 
