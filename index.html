@@ -435,6 +435,15 @@ holiday_aus %&gt;%
 ]
 
 ---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+---
 
 class: top
 
@@ -442,7 +451,7 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### A simple average of forecasts
 
 &lt;br&gt;
 .left-code[
@@ -589,6 +598,155 @@ holiday_aus %&gt;%
 .right-plot[
 &lt;img src="figure/tourism-total-combn-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
 ]
+
+---
+
+# Inconclusive for just one series
+
+### We should scale it up
+
+
+```r
+tourism
+```
+
+```
+#&gt; # A tsibble: 24,320 x 5 [1Q]
+#&gt; # Key:       Region, State, Purpose [304]
+#&gt;    Quarter Region   State           Purpose  Trips
+#&gt;      &lt;qtr&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;chr&gt;    &lt;dbl&gt;
+#&gt;  1 1998 Q1 Adelaide South Australia Business  135.
+#&gt;  2 1998 Q2 Adelaide South Australia Business  110.
+#&gt;  3 1998 Q3 Adelaide South Australia Business  166.
+#&gt;  4 1998 Q4 Adelaide South Australia Business  127.
+#&gt;  5 1999 Q1 Adelaide South Australia Business  137.
+#&gt;  6 1999 Q2 Adelaide South Australia Business  200.
+#&gt;  7 1999 Q3 Adelaide South Australia Business  169.
+#&gt;  8 1999 Q4 Adelaide South Australia Business  134.
+#&gt;  9 2000 Q1 Adelaide South Australia Business  154.
+#&gt; 10 2000 Q2 Adelaide South Australia Business  169.
+#&gt; # … with 24,310 more rows
+```
+
+---
+
+# But wait, there's more
+
+### We can also model the aggregations
+
+
+```r
+tourism_agg &lt;- tourism %&gt;% 
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips))
+```
+
+
+```
+#&gt; # A tsibble: 34,000 x 5 [1Q]
+#&gt; # Key:       State, Region, Purpose [425]
+#&gt;    State   Region  Purpose Quarter  Trips
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;qtr&gt;  &lt;dbl&gt;
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q1 23182.
+#&gt;  2 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q2 20323.
+#&gt;  3 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q3 19827.
+#&gt;  4 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q4 20830.
+#&gt;  5 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q1 22087.
+#&gt;  6 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q2 21458.
+#&gt;  7 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q3 19914.
+#&gt;  8 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q4 20028.
+#&gt;  9 &lt;total&gt; &lt;total&gt; &lt;total&gt; 2000 Q1 22339.
+#&gt; 10 &lt;total&gt; &lt;total&gt; &lt;total&gt; 2000 Q2 19941.
+#&gt; # … with 33,990 more rows
+```
+
+---
+
+# This may take a while
+
+### Good think it can be done in parallel!
+
+
+```r
+library(future)
+plan(multiprocess)
+fit &lt;- tourism_agg %&gt;% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_a + ets_m + arima)/3
+  )
+```
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+
+```r
+tourism_accuracy &lt;- accuracy(fit)
+tourism_accuracy
+```
+
+```
+#&gt; # A tibble: 1,700 x 12
+#&gt;    State   Region  Purpose  .model .type        ME  RMSE   MAE      MPE  MAPE  MASE     ACF1
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  ets_a  Training 105.   794.  604.    0.379   2.86 0.636 -0.00151
+#&gt;  2 &lt;total&gt; &lt;total&gt; Business ets_a  Training  39.7  288.  221.    0.468   5.39 0.728 -0.00902
+#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  ets_a  Training  53.5  428.  331.    0.349   3.45 0.799 -0.0640 
+#&gt;  4 &lt;total&gt; &lt;total&gt; Other    ets_a  Training  13.9  102.   82.1   0.435   8.76 0.713 -0.0594 
+#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting ets_a  Training  51.2  348.  266.    0.488   3.83 0.657 -0.0450 
+#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  ets_a  Training   8.44  63.9  52.0   0.0884 10.2  0.752  0.0112 
+#&gt;  7 ACT     &lt;total&gt; Business ets_a  Training   4.28  32.7  26.7  -1.99   18.6  0.701  0.0388 
+#&gt;  8 ACT     &lt;total&gt; Holiday  ets_a  Training   3.63  38.9  28.5  -2.00   18.6  0.839  0.110  
+#&gt;  9 ACT     &lt;total&gt; Other    ets_a  Training   1.31  12.4  10.2 -16.1    42.9  0.792  0.0477 
+#&gt; 10 ACT     &lt;total&gt; Visiting ets_a  Training   2.91  30.1  21.9  -0.686  11.5  0.647  0.0892 
+#&gt; # … with 1,690 more rows
+```
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+
+```r
+tourism_accuracy %&gt;% 
+  group_by(.model) %&gt;%
+  summarise(mean(MASE), median(MASE)) %&gt;% 
+  arrange(`median(MASE)`)
+```
+
+```
+#&gt; # A tibble: 4 x 3
+#&gt;   .model `mean(MASE)` `median(MASE)`
+#&gt;   &lt;chr&gt;         &lt;dbl&gt;          &lt;dbl&gt;
+#&gt; 1 combn         0.745          0.733
+#&gt; 2 ets_a         0.757          0.742
+#&gt; 3 ets_m         0.760          0.746
+#&gt; 4 arima         0.766          0.765
+```
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+
+```r
+tourism_accuracy %&gt;% 
+  ggplot(aes(x = MASE, colour = .model)) +
+  geom_density() + scale_x_log10()
+```
+
+&lt;img src="figure/tourism-agg-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 

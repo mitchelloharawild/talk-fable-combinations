@@ -397,6 +397,15 @@ holiday_aus %>%
 ]
 
 ---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+---
 
 class: top
 
@@ -404,7 +413,7 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### A simple average of forecasts
 
 <br>
 .left-code[
@@ -518,6 +527,87 @@ holiday_aus %>%
 ```{r tourism-total-combn-plot-output, ref.label="tourism-total-combn-plot", echo=FALSE, cache=TRUE, fig.height = 6}
 ```
 ]
+
+---
+
+# Inconclusive for just one series
+
+### We should scale it up
+
+```{r tourism-data-2, echo = TRUE}
+tourism
+```
+
+---
+
+# But wait, there's more
+
+### We can also model the aggregations
+
+```{r tourism-agg, echo = TRUE}
+tourism_agg <- tourism %>% 
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips))
+```
+
+```{r tourism-agg-print, echo = FALSE}
+tourism_agg
+```
+
+---
+
+# This may take a while
+
+### Good think it can be done in parallel!
+
+```{r tourism-agg-mdl, echo = TRUE, cache = TRUE}
+library(future)
+plan(multiprocess)
+fit <- tourism_agg %>% 
+  model(
+    ets_a = ETS(Trips ~ season("A")),
+    ets_m = ETS(Trips ~ season("M")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  mutate(
+    combn = (ets_a + ets_m + arima)/3
+  )
+```
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+```{r tourism-agg-acc, echo = TRUE, cache = TRUE}
+tourism_accuracy <- accuracy(fit)
+tourism_accuracy
+```
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+```{r tourism-agg-acc-central, echo = TRUE, cache = TRUE}
+tourism_accuracy %>% 
+  group_by(.model) %>%
+  summarise(mean(MASE), median(MASE)) %>% 
+  arrange(`median(MASE)`)
+```
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+```{r tourism-agg-acc-plot, echo = TRUE, cache = TRUE}
+tourism_accuracy %>% 
+  ggplot(aes(x = MASE, colour = .model)) +
+  geom_density() + scale_x_log10()
+```
 
 ---
 
