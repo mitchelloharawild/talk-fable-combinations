@@ -330,14 +330,34 @@ class: top, inverse
 ---
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecast accuracy evaluation
 
+```{r, fig.height = 3}
+fit <- holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(ETS(Trips))
+fit %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(holiday_aus) + 
+  autolayer(augment(fit), .fitted, colour = "blue", linetype = "dashed") + 
+  geom_vline(aes(xintercept = yearquarter("2014 Q4"))) + 
+  geom_label(aes(x=x, y=y, label=label), 
+                 data = tibble(
+                   x = yearquarter(c("2006 Q2", "2016 Q3")), 
+                   y = c(13000, 13000), 
+                   label = c("Training", "Test")
+                 )
+  ) + 
+  theme(legend.position = "right")
+```
 
-- Trai
+### MASE: Mean absolute scaled error
 
-### Measures
+$$\text{MASE} = \dfrac{1}{T}\sum_{t = 1}^{T}\left|\frac{\displaystyle e_{j}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$
+
+???
+
+The scale is the mean absolute error (MAE) of the seasonal naive model. Essentially, MASE is an accuracy measure relative to the seasonal naive model.
 
 ---
 class: top
@@ -352,6 +372,7 @@ class: top
 .left-code[
 ```{r tourism-total-many-mdls, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")), #<<
     ets_a = ETS(Trips ~ trend("A")), #<<
@@ -378,6 +399,7 @@ class: top
 .left-code[
 ```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -407,6 +429,7 @@ class: top
 .left-code[
 ```{r tourism-total-many-acc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -595,7 +618,8 @@ fit <- tourism_agg %>%
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   )
 ```
 ```{r tourism-agg-mdl-print, echo = FALSE}
@@ -638,6 +662,17 @@ tourism_accuracy %>%
   ggplot(aes(x = MASE, colour = .model)) +
   geom_density() + scale_x_log10()
 ```
+
+---
+
+```{r}
+fc_acc <- fit %>% 
+  reconcile(coherent = min_trace(wt_combn)) %>% 
+  forecast(h = "3 years") %>% 
+  accuracy(tourism_agg)
+fc_acc %>% group_by(.model) %>% summarise(median(MASE), mean(MASE))
+```
+
 
 ---
 
