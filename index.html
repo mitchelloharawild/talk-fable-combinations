@@ -369,13 +369,10 @@ The scale is the mean absolute error (MAE) of the seasonal naive model. Essentia
 ---
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Comparing multiple models
 
 ### Estimate multiple models
 
-&lt;br&gt;
 .left-code[
 
 ```r
@@ -402,43 +399,10 @@ holiday_aus %&gt;%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Comparing multiple models
 
-### Forecasts from multiple models
+### In-sample training accuracy
 
-&lt;br&gt;
-.left-code[
-
-```r
-holiday_aus %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-* forecast(h = "3 years") %&gt;%
-* autoplot(holiday_aus, level = NULL)
-```
-]
-.right-plot[
-&lt;img src="figure/tourism-total-many-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-
----
-
-class: top
-
-.sticker-float[![fable](resources/fable.svg)]
-
-# Comparing multiple models
-
-### Compare model performance
-
-&lt;br&gt;
 .left-code[
 
 ```r
@@ -466,6 +430,67 @@ holiday_aus %&gt;%
 ]
 
 ---
+
+class: top
+
+# Comparing multiple models
+
+### Forecasts from multiple models
+
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+* forecast(h = "3 years") %&gt;%
+* autoplot(holiday_aus, level = NULL)
+```
+]
+.right-plot[
+&lt;img src="figure/tourism-total-many-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: top
+
+# Comparing multiple models
+
+### Out-of-sample forecast accuracy
+
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  forecast(h = "3 years") %&gt;%
+* accuracy(holiday_aus) %&gt;%
+* arrange(MASE)
+```
+]
+.right-plot[
+
+```
+#&gt; # A tibble: 3 x 9
+#&gt;   .model .type    ME  RMSE   MAE   MPE  MAPE  MASE  ACF1
+#&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 ets_a  Test   581.  700.  581.  5.36  5.36  1.46 0.304
+#&gt; 2 ets_n  Test   939. 1061.  939.  8.69  8.69  2.36 0.415
+#&gt; 3 arima  Test  1261. 1380. 1261. 11.7  11.7   3.16 0.425
+```
+]
+
+---
 class: inverse, top
 
 .sticker-float[![fable](resources/fable.svg)]
@@ -478,17 +503,15 @@ class: inverse, top
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Model ensembling
 
 ### A simple average of forecasts
 
-&lt;br&gt;
 .left-code[
 
 ```r
-holiday_aus %&gt;% 
+holiday_aus %&gt;%
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -505,7 +528,7 @@ holiday_aus %&gt;%
 #&gt; # A mable: 1 x 4
 #&gt;   ets_n        ets_a        arima                    combn        
 #&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;      
-#&gt; 1 &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt; 1 &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt; &lt;COMBINATION&gt;
 ```
 ]
 
@@ -513,24 +536,59 @@ holiday_aus %&gt;%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Model ensembling
 
-### Is the combination better than its parts?
+### A simple average of forecasts
 
-&lt;br&gt;
 .left-code[
 
 ```r
-holiday_aus %&gt;% 
+holiday_aus %&gt;%
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+*   wt_combn = combination_ensemble(
+*     ets_n, ets_a, arima,
+*     weights = "inv_var")
+  )
+```
+]
+.right-plot[
+
+```
+#&gt; # A mable: 1 x 5
+#&gt;   ets_n        ets_a        arima                    combn         wt_combn     
+#&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;       &lt;model&gt;      
+#&gt; 1 &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt; &lt;COMBINATION&gt; &lt;COMBINATION&gt;
+```
+]
+
+---
+
+class: top
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %&gt;% 
 * accuracy() %&gt;%
 * arrange(MASE)
@@ -539,13 +597,14 @@ holiday_aus %&gt;%
 .right-plot[
 
 ```
-#&gt; # A tibble: 4 x 9
-#&gt;   .model .type       ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
-#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 ets_a  Training  77.3  414.  312. 0.644  3.26 0.753  0.0268
-#&gt; 2 combn  Training  74.1  419.  314. 0.600  3.29 0.759 -0.0545
-#&gt; 3 ets_n  Training  55.5  427.  327. 0.374  3.41 0.789 -0.0578
-#&gt; 4 arima  Training  89.5  443.  328. 0.781  3.43 0.791 -0.0996
+#&gt; # A tibble: 5 x 9
+#&gt;   .model   .type         ME  RMSE   MAE    MPE  MAPE  MASE     ACF1
+#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 combn    Training  -12.0   414.  313. -0.294  3.34 0.785  0.00966
+#&gt; 2 wt_combn Training   33.8   421.  318.  0.193  3.37 0.797 -0.0404 
+#&gt; 3 ets_a    Training   63.2   423.  321.  0.515  3.41 0.805 -0.0504 
+#&gt; 4 ets_n    Training    4.48  422.  321. -0.128  3.41 0.805 -0.0218 
+#&gt; 5 arima    Training -104.    456.  337. -1.27   3.65 0.846  0.126
 ```
 ]
 
@@ -553,24 +612,23 @@ holiday_aus %&gt;%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Model ensembling
 
 ### Is the combination better than its parts?
 
-&lt;br&gt;
 .left-code[
 
 ```r
 holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %&gt;% 
 * select(combn) %&gt;%
 * forecast(h = "3 years")
@@ -583,18 +641,18 @@ holiday_aus %&gt;%
 #&gt; # Key:     .model [1]
 #&gt;    .model Quarter  Trips .distribution   
 #&gt;    &lt;chr&gt;    &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;          
-#&gt;  1 combn  2018 Q1 13072. N(13072, 302312)
-#&gt;  2 combn  2018 Q2 11032. N(11032, 256076)
-#&gt;  3 combn  2018 Q3 10651. N(10651, 262519)
-#&gt;  4 combn  2018 Q4 10926. N(10926, 292411)
-#&gt;  5 combn  2019 Q1 13349. N(13349, 439106)
-#&gt;  6 combn  2019 Q2 11278. N(11278, 370208)
-#&gt;  7 combn  2019 Q3 10890. N(10890, 377655)
-#&gt;  8 combn  2019 Q4 11167. N(11167, 418594)
-#&gt;  9 combn  2020 Q1 13626. N(13626, 620471)
-#&gt; 10 combn  2020 Q2 11524. N(11524, 521640)
-#&gt; 11 combn  2020 Q3 11129. N(11129, 530074)
-#&gt; 12 combn  2020 Q4 11409. N(11409, 585096)
+#&gt;  1 combn  2015 Q1 11254. N(11254, 253832)
+#&gt;  2 combn  2015 Q2  9523. N( 9523, 207426)
+#&gt;  3 combn  2015 Q3  8981. N( 8981, 201685)
+#&gt;  4 combn  2015 Q4  9188. N( 9188, 214675)
+#&gt;  5 combn  2016 Q1 11265. N(11265, 314195)
+#&gt;  6 combn  2016 Q2  9466. N( 9466, 256278)
+#&gt;  7 combn  2016 Q3  9006. N( 9006, 249327)
+#&gt;  8 combn  2016 Q4  9175. N( 9175, 265807)
+#&gt;  9 combn  2017 Q1 11330. N(11330, 376395)
+#&gt; 10 combn  2017 Q2  9520. N( 9520, 304698)
+#&gt; 11 combn  2017 Q3  9058. N( 9058, 296063)
+#&gt; 12 combn  2017 Q4  9227. N( 9227, 316203)
 ```
 ]
 
@@ -602,32 +660,72 @@ holiday_aus %&gt;%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
+# Model ensembling
+
+### Is the combination better than its parts?
+
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
+  ) %&gt;% 
+  forecast(h = "3 years") %&gt;% 
+* autoplot(holiday_aus, level = NULL)
+```
+]
+.right-plot[
+&lt;img src="figure/tourism-total-combn-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+class: top
 
 # Model ensembling
 
 ### Is the combination better than its parts?
 
-&lt;br&gt;
 .left-code[
 
 ```r
 holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
-    ets_n = ETS(Trips ~ season("A")),
-    ets_a = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %&gt;% 
-  select(combn) %&gt;% 
   forecast(h = "3 years") %&gt;% 
-* autoplot(holiday_aus)
+* accuracy(holiday_aus) %&gt;%
+* arrange(MASE)
 ```
 ]
 .right-plot[
-&lt;img src="figure/tourism-total-combn-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+
+```
+#&gt; # A tibble: 5 x 9
+#&gt;   .model   .type    ME  RMSE   MAE   MPE  MAPE  MASE  ACF1
+#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 ets_a    Test   581.  700.  581.  5.36  5.36  1.46 0.304
+#&gt; 2 wt_combn Test   760.  878.  760.  7.03  7.03  1.91 0.364
+#&gt; 3 combn    Test   927. 1042.  927.  8.57  8.57  2.33 0.390
+#&gt; 4 ets_n    Test   939. 1061.  939.  8.69  8.69  2.36 0.415
+#&gt; 5 arima    Test  1261. 1380. 1261. 11.7  11.7   3.16 0.425
+```
 ]
 
 ---

@@ -362,13 +362,10 @@ The scale is the mean absolute error (MAE) of the seasonal naive model. Essentia
 ---
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Comparing multiple models
 
 ### Estimate multiple models
 
-<br>
 .left-code[
 ```{r tourism-total-many-mdls, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
@@ -389,43 +386,10 @@ holiday_aus %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Comparing multiple models
 
-### Forecasts from multiple models
+### In-sample training accuracy
 
-<br>
-.left-code[
-```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  forecast(h = "3 years") %>% #<<
-  autoplot(holiday_aus, level = NULL) #<<
-```
-]
-.right-plot[
-```{r tourism-total-many-plot-output, ref.label="tourism-total-many-plot", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
-
-
----
-
-class: top
-
-.sticker-float[![fable](resources/fable.svg)]
-
-# Comparing multiple models
-
-### Compare model performance
-
-<br>
 .left-code[
 ```{r tourism-total-many-acc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
@@ -445,6 +409,59 @@ holiday_aus %>%
 ]
 
 ---
+
+class: top
+
+# Comparing multiple models
+
+### Forecasts from multiple models
+
+.left-code[
+```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  forecast(h = "3 years") %>% #<<
+  autoplot(holiday_aus, level = NULL) #<<
+```
+]
+.right-plot[
+```{r tourism-total-many-plot-output, ref.label="tourism-total-many-plot", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+# Comparing multiple models
+
+### Out-of-sample forecast accuracy
+
+.left-code[
+```{r tourism-total-many-fc-acc, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  forecast(h = "3 years") %>%
+  accuracy(holiday_aus) %>%  #<<
+  arrange(MASE) #<<
+```
+]
+.right-plot[
+```{r tourism-total-many-fc-acc-output, ref.label="tourism-total-many-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
 class: inverse, top
 
 .sticker-float[![fable](resources/fable.svg)]
@@ -457,16 +474,14 @@ class: inverse, top
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Model ensembling
 
 ### A simple average of forecasts
 
-<br>
 .left-code[
-```{r tourism-total-combn, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+```{r tourism-total-combn-1, eval=FALSE, echo=TRUE}
+holiday_aus %>%
+  filter(Quarter < yearquarter("2015 Q1")) %>%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -478,7 +493,7 @@ holiday_aus %>%
 ```
 ]
 .right-plot[
-```{r tourism-total-combn-output, ref.label="tourism-total-combn", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-total-combn-1-output, ref.label="tourism-total-combn-1", echo=FALSE, cache=TRUE, fig.height = 6}
 ```
 ]
 
@@ -486,23 +501,52 @@ holiday_aus %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Model ensembling
 
-### Is the combination better than its parts?
+### A simple average of forecasts
 
-<br>
 .left-code[
-```{r tourism-total-combn-acc, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+```{r tourism-total-combn-2, eval=FALSE, echo=TRUE}
+holiday_aus %>%
+  filter(Quarter < yearquarter("2015 Q1")) %>%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble( #<<
+      ets_n, ets_a, arima, #<<
+      weights = "inv_var") #<<
+  )
+```
+]
+.right-plot[
+```{r tourism-total-combn-2-output, ref.label="tourism-total-combn-2", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+# Model ensembling
+
+### Is the combination better than its parts?
+
+.left-code[
+```{r tourism-total-combn-acc, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %>% 
   accuracy() %>% #<<
   arrange(MASE) #<<
@@ -517,23 +561,22 @@ holiday_aus %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Model ensembling
 
 ### Is the combination better than its parts?
 
-<br>
 .left-code[
 ```{r tourism-total-combn-fc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %>% 
   select(combn) %>% #<<
   forecast(h = "3 years") #<<
@@ -548,31 +591,61 @@ holiday_aus %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
+# Model ensembling
+
+### Is the combination better than its parts?
+
+.left-code[
+```{r tourism-total-combn-plot, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
+  ) %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(holiday_aus, level = NULL) #<<
+```
+]
+.right-plot[
+```{r tourism-total-combn-plot-output, ref.label="tourism-total-combn-plot", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+
+---
+
+class: top
 
 # Model ensembling
 
 ### Is the combination better than its parts?
 
-<br>
 .left-code[
-```{r tourism-total-combn-plot, eval=FALSE, echo=TRUE}
+```{r tourism-total-combn-fc-acc, eval=FALSE, echo=TRUE}
 holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
-    ets_n = ETS(Trips ~ season("A")),
-    ets_a = ETS(Trips ~ season("M")),
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
   mutate(
-    combn = (ets_n + ets_a + arima)/3
+    combn = (ets_n + ets_a + arima)/3,
+    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %>% 
-  select(combn) %>% 
   forecast(h = "3 years") %>% 
-  autoplot(holiday_aus) #<<
+  accuracy(holiday_aus) %>% #<<
+  arrange(MASE) #<<
 ```
 ]
 .right-plot[
-```{r tourism-total-combn-plot-output, ref.label="tourism-total-combn-plot", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-total-combn-fc-acc-output, ref.label="tourism-total-combn-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
 ```
 ]
 
