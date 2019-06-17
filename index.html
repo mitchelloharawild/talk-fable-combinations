@@ -765,8 +765,8 @@ tourism
 
 
 ```r
-tourism_agg &lt;- tourism %&gt;% 
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips))
+tourism_aggregated &lt;- tourism %&gt;% 
+* aggregate_key((State / Region) * Purpose, Trips = sum(Trips))
 ```
 
 
@@ -796,9 +796,9 @@ tourism_agg &lt;- tourism %&gt;%
 
 
 ```r
-library(future)
-plan(multiprocess)
-fit &lt;- tourism_agg %&gt;% 
+*library(future)
+*plan(multiprocess)
+*fit &lt;- tourism_aggregated %&gt;%
   filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -839,7 +839,6 @@ fit &lt;- tourism_agg %&gt;%
 
 ```r
 tourism_accuracy &lt;- accuracy(fit)
-tourism_accuracy
 ```
 
 ```
@@ -869,19 +868,48 @@ tourism_accuracy
 ```r
 tourism_accuracy %&gt;% 
   group_by(.model) %&gt;%
-  summarise(mean(MASE), median(MASE)) %&gt;% 
-  arrange(`median(MASE)`)
+  summarise_at(vars(ME:ACF1), median) %&gt;% 
+  arrange(MASE)
 ```
 
 ```
-#&gt; # A tibble: 5 x 3
-#&gt;   .model   `mean(MASE)` `median(MASE)`
-#&gt;   &lt;chr&gt;           &lt;dbl&gt;          &lt;dbl&gt;
-#&gt; 1 combn           0.727          0.727
-#&gt; 2 wt_combn        0.733          0.730
-#&gt; 3 ets_n           0.739          0.738
-#&gt; 4 ets_a           0.745          0.743
-#&gt; 5 arima           0.754          0.754
+#&gt; # A tibble: 5 x 8
+#&gt;   .model          ME  RMSE   MAE   MPE  MAPE  MASE     ACF1
+#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 combn    -1.77e- 2  14.6  11.3 -9.78  25.9 0.727  0.00268
+#&gt; 2 wt_combn -2.05e- 2  14.5  11.4 -9.72  26.0 0.730  0.00568
+#&gt; 3 ets_n     1.51e- 4  14.5  11.6 -8.71  25.9 0.738  0.00878
+#&gt; 4 ets_a    -1.12e- 1  14.6  11.6 NA     26.2 0.743  0.0116 
+#&gt; 5 arima     8.30e-16  15.2  11.6 NA     27.2 0.754 -0.00750
+```
+
+
+---
+
+# Are the combinations better?
+
+### Let's find out...
+
+
+```r
+tourism_accuracy_fc &lt;- fit %&gt;% 
+  forecast(h = "3 years") %&gt;% 
+  accuracy(tourism_aggregated)
+tourism_accuracy_fc %&gt;% 
+  group_by(.model) %&gt;%
+  summarise_at(vars(ME:ACF1), median) %&gt;% 
+  arrange(MASE)
+```
+
+```
+#&gt; # A tibble: 5 x 8
+#&gt;   .model      ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
+#&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 ets_n     8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
+#&gt; 2 wt_combn  7.66  19.1  15.4  6.74  25.2 0.986 -0.0834
+#&gt; 3 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
+#&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
+#&gt; 5 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
 
 ---
@@ -892,28 +920,66 @@ tourism_accuracy %&gt;%
 
 
 ```r
-tourism_accuracy %&gt;% 
+tourism_accuracy_fc %&gt;% 
   ggplot(aes(x = MASE, colour = .model)) +
   geom_density() + scale_x_log10()
 ```
 
-&lt;img src="figure/tourism-agg-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="figure/tourism-agg-fc-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
+# Forecast reconciliation
 
-```
-#&gt; # A tibble: 6 x 3
-#&gt;   .model   `median(MASE)` `mean(MASE)`
-#&gt;   &lt;chr&gt;             &lt;dbl&gt;        &lt;dbl&gt;
-#&gt; 1 arima             1.07          1.17
-#&gt; 2 coherent          0.933         1.01
-#&gt; 3 combn             0.995         1.07
-#&gt; 4 ets_a             1.03          1.10
-#&gt; 5 ets_n             0.982         1.09
-#&gt; 6 wt_combn          0.986         1.08
+
+```r
+tourism_accuracy_reconciled &lt;- fit %&gt;% 
+* reconcile(coherent = min_trace(wt_combn)) %&gt;%
+  forecast(h = "3 years") %&gt;% 
+  accuracy(tourism_aggregated)
 ```
 
+```
+#&gt; # A tibble: 2,550 x 12
+#&gt;    .model State   Region  Purpose  .type     ME   RMSE    MAE   MPE  MAPE  MASE     ACF1
+#&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 arima  &lt;total&gt; &lt;total&gt; &lt;total&gt;  Test  1397.  1795.  1452.   5.31  5.54 1.58   0.496  
+#&gt;  2 arima  &lt;total&gt; &lt;total&gt; Business Test   820.   968.   883.  15.1  16.6  2.97   0.233  
+#&gt;  3 arima  &lt;total&gt; &lt;total&gt; Holiday  Test  1261.  1380.  1261.  11.7  11.7  3.16   0.425  
+#&gt;  4 arima  &lt;total&gt; &lt;total&gt; Other    Test   -12.4  112.    76.3 -1.59  5.62 0.646 -0.133  
+#&gt;  5 arima  &lt;total&gt; &lt;total&gt; Visiting Test   538.   686.   539.   6.18  6.20 1.30   0.281  
+#&gt;  6 arima  ACT     &lt;total&gt; &lt;total&gt;  Test   138.   152.   138.  21.1  21.1  2.01   0.00268
+#&gt;  7 arima  ACT     &lt;total&gt; Business Test    45.2   61.9   53.0 19.0  26.5  1.44   0.0205 
+#&gt;  8 arima  ACT     &lt;total&gt; Holiday  Test    40.8   52.8   44.2 18.9  21.5  1.33   0.150  
+#&gt;  9 arima  ACT     &lt;total&gt; Other    Test    12.2   18.1   13.9 22.3  31.2  1.11   0.0980 
+#&gt; 10 arima  ACT     &lt;total&gt; Visiting Test    33.6   49.8   38.7 13.4  16.4  1.17   0.0407 
+#&gt; # … with 2,540 more rows
+```
+
+```
+#&gt; # A tibble: 6 x 8
+#&gt;   .model      ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
+#&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
+#&gt; 2 coherent  5.47  18.2  14.2 NA     23.1 0.933 -0.0821
+#&gt; 3 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
+#&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
+#&gt; 5 ets_n     8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
+#&gt; 6 wt_combn  7.66  19.1  15.4  6.74  25.2 0.986 -0.0834
+```
+
+---
+
+# Forecast reconciliation
+
+
+```r
+tourism_accuracy_reconciled %&gt;% 
+  ggplot(aes(x = MASE, colour = .model)) +
+  geom_density() + scale_x_log10()
+```
+
+&lt;img src="figure/tourism-agg-acc-mint-plot-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
