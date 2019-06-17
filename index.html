@@ -349,6 +349,8 @@ class: top, inverse
 
 &lt;br&gt;
 
+--
+
 # But are they good forecasts?
 
 ---
@@ -357,6 +359,8 @@ class: top
 # Forecast accuracy evaluation
 
 &lt;img src="figure/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
 
 ### MASE: Mean absolute scaled error
 
@@ -495,7 +499,16 @@ class: inverse, top
 
 .sticker-float[![fable](resources/fable.svg)]
 
-# Model ensembling
+&lt;br&gt;
+
+# Improving forecast accuracy
+
+--
+
+&lt;br&gt;
+&lt;br&gt;
+
+## Idea 1: Model ensembling
 
 ### Is the combination better than its parts?
 
@@ -539,6 +552,53 @@ class: top
 # Model ensembling
 
 ### A simple average of forecasts
+
+.left-code[
+
+```r
+holiday_aus %&gt;% 
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3
+  ) %&gt;% 
+* select(combn) %&gt;%
+* forecast(h = "3 years")
+```
+]
+.right-plot[
+
+```
+#&gt; # A fable: 12 x 4 [1Q]
+#&gt; # Key:     .model [1]
+#&gt;    .model Quarter  Trips .distribution   
+#&gt;    &lt;chr&gt;    &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;          
+#&gt;  1 combn  2015 Q1 11254. N(11254, 253832)
+#&gt;  2 combn  2015 Q2  9523. N( 9523, 207426)
+#&gt;  3 combn  2015 Q3  8981. N( 8981, 201685)
+#&gt;  4 combn  2015 Q4  9188. N( 9188, 214675)
+#&gt;  5 combn  2016 Q1 11265. N(11265, 314195)
+#&gt;  6 combn  2016 Q2  9466. N( 9466, 256278)
+#&gt;  7 combn  2016 Q3  9006. N( 9006, 249327)
+#&gt;  8 combn  2016 Q4  9175. N( 9175, 265807)
+#&gt;  9 combn  2017 Q1 11330. N(11330, 376395)
+#&gt; 10 combn  2017 Q2  9520. N( 9520, 304698)
+#&gt; 11 combn  2017 Q3  9058. N( 9058, 296063)
+#&gt; 12 combn  2017 Q4  9227. N( 9227, 316203)
+```
+]
+
+---
+
+class: top
+
+# Model ensembling
+
+### A weighted average of forecasts
 
 .left-code[
 
@@ -630,54 +690,6 @@ holiday_aus %&gt;%
     combn = (ets_n + ets_a + arima)/3,
     wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
   ) %&gt;% 
-* select(combn) %&gt;%
-* forecast(h = "3 years")
-```
-]
-.right-plot[
-
-```
-#&gt; # A fable: 12 x 4 [1Q]
-#&gt; # Key:     .model [1]
-#&gt;    .model Quarter  Trips .distribution   
-#&gt;    &lt;chr&gt;    &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;          
-#&gt;  1 combn  2015 Q1 11254. N(11254, 253832)
-#&gt;  2 combn  2015 Q2  9523. N( 9523, 207426)
-#&gt;  3 combn  2015 Q3  8981. N( 8981, 201685)
-#&gt;  4 combn  2015 Q4  9188. N( 9188, 214675)
-#&gt;  5 combn  2016 Q1 11265. N(11265, 314195)
-#&gt;  6 combn  2016 Q2  9466. N( 9466, 256278)
-#&gt;  7 combn  2016 Q3  9006. N( 9006, 249327)
-#&gt;  8 combn  2016 Q4  9175. N( 9175, 265807)
-#&gt;  9 combn  2017 Q1 11330. N(11330, 376395)
-#&gt; 10 combn  2017 Q2  9520. N( 9520, 304698)
-#&gt; 11 combn  2017 Q3  9058. N( 9058, 296063)
-#&gt; 12 combn  2017 Q4  9227. N( 9227, 316203)
-```
-]
-
----
-
-class: top
-
-# Model ensembling
-
-### Is the combination better than its parts?
-
-.left-code[
-
-```r
-holiday_aus %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %&gt;% 
   forecast(h = "3 years") %&gt;% 
 * autoplot(holiday_aus, level = NULL)
 ```
@@ -732,7 +744,9 @@ holiday_aus %&gt;%
 
 # Inconclusive for just one series
 
-### We should scale it up
+--
+
+### Consider all series in the data...
 
 
 ```r
@@ -759,7 +773,7 @@ tourism
 
 ---
 
-# But wait, there's more
+# But wait, there's more!
 
 ### We can also model the aggregations
 
@@ -790,15 +804,17 @@ tourism_aggregated &lt;- tourism %&gt;%
 
 ---
 
-# This may take a while
+# This may take a while...
 
-### Good think it can be done in parallel!
+--
+
+### Fortunately, this is embarrassingly parallel!
 
 
 ```r
 *library(future)
 *plan(multiprocess)
-*fit &lt;- tourism_aggregated %&gt;%
+fit &lt;- tourism_aggregated %&gt;%
   filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -834,7 +850,7 @@ tourism_aggregated &lt;- tourism %&gt;%
 
 # Are the combinations better?
 
-### Let's find out...
+### In-sample training accuracy
 
 
 ```r
@@ -862,7 +878,8 @@ tourism_accuracy &lt;- accuracy(fit)
 
 # Are the combinations better?
 
-### Let's find out...
+
+### In-sample training accuracy
 
 
 ```r
@@ -883,12 +900,27 @@ tourism_accuracy %&gt;%
 #&gt; 5 arima     8.30e-16  15.2  11.6 NA     27.2 0.754 -0.00750
 ```
 
+---
+
+# Are the combinations better?
+
+### In-sample training accuracy
+
+
+```r
+tourism_accuracy %&gt;% 
+  ggplot(aes(x = MASE, colour = .model)) +
+  geom_density() + scale_x_log10()
+```
+
+&lt;img src="figure/tourism-agg-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
+
 
 ---
 
 # Are the combinations better?
 
-### Let's find out...
+### Out-of-sample forecast accuracy
 
 
 ```r
@@ -916,7 +948,7 @@ tourism_accuracy_fc %&gt;%
 
 # Are the combinations better?
 
-### Let's find out...
+### Out-of-sample forecast accuracy
 
 
 ```r
@@ -926,6 +958,25 @@ tourism_accuracy_fc %&gt;%
 ```
 
 &lt;img src="figure/tourism-agg-fc-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+&lt;br&gt; 
+
+# Improving forecast accuracy
+
+--
+
+&lt;br&gt;
+&lt;br&gt;
+
+## Idea 2: Forecast reconciliation
+
+### Does imposing aggregation structure improve the forecasts?
 
 ---
 
@@ -938,6 +989,7 @@ tourism_accuracy_reconciled &lt;- fit %&gt;%
   forecast(h = "3 years") %&gt;% 
   accuracy(tourism_aggregated)
 ```
+
 
 ```
 #&gt; # A tibble: 2,550 x 12
@@ -956,16 +1008,29 @@ tourism_accuracy_reconciled &lt;- fit %&gt;%
 #&gt; # … with 2,540 more rows
 ```
 
+
+---
+
+# Forecast reconciliation
+
+
+```r
+tourism_accuracy_reconciled %&gt;% 
+  group_by(.model) %&gt;%
+  summarise_at(vars(ME:ACF1), median) %&gt;% 
+  arrange(MASE)
+```
+
 ```
 #&gt; # A tibble: 6 x 8
 #&gt;   .model      ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
 #&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
-#&gt; 2 coherent  5.47  18.2  14.2 NA     23.1 0.933 -0.0821
-#&gt; 3 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
-#&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
-#&gt; 5 ets_n     8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
-#&gt; 6 wt_combn  7.66  19.1  15.4  6.74  25.2 0.986 -0.0834
+#&gt; 1 coherent  5.47  18.2  14.2 NA     23.1 0.933 -0.0821
+#&gt; 2 ets_n     8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
+#&gt; 3 wt_combn  7.66  19.1  15.4  6.74  25.2 0.986 -0.0834
+#&gt; 4 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
+#&gt; 5 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
+#&gt; 6 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
 
 ---
@@ -980,6 +1045,196 @@ tourism_accuracy_reconciled %&gt;%
 ```
 
 &lt;img src="figure/tourism-agg-acc-mint-plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+--
+
+
+```r
+library(fable)
+library(tidyverse)
+tsibble::tourism %&gt;% 
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;% 
+  model(ets_n = ETS(Trips ~ trend("N")),
+        ens_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips)) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
+  reconcile(coherent = min_trace(combn)) %&gt;% 
+  forecast(h = "3 years")
+```
+
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+*library(fable)
+*library(tidyverse)
+tsibble::tourism %&gt;% 
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;% 
+  model(ets_n = ETS(Trips ~ trend("N")),
+        ens_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips)) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
+  reconcile(coherent = min_trace(combn)) %&gt;% 
+  forecast(h = "3 years")
+```
+
+### Integrates seamlessly with the tidyverse
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+library(fable)
+library(tidyverse)
+*tsibble::tourism %&gt;%
+* aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;%
+  model(ets_n = ETS(Trips ~ trend("N")),
+        ens_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips)) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
+  reconcile(coherent = min_trace(combn)) %&gt;% 
+  forecast(h = "3 years")
+```
+
+### Tidy temporal data suitable for the future of time series
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+library(fable)
+library(tidyverse)
+tsibble::tourism %&gt;%
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;%
+* model(ets_n = ETS(Trips ~ trend("N")),
+*       ens_a = ETS(Trips ~ trend("A")),
+*       arima = ARIMA(Trips)) %&gt;%
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
+  reconcile(coherent = min_trace(combn)) %&gt;% 
+  forecast(h = "3 years")
+```
+
+### Flexible, and succinct model specification
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+library(fable)
+library(tidyverse)
+tsibble::tourism %&gt;%
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;%
+  model(ets_n = ETS(Trips ~ trend("N")), 
+        ens_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips)) %&gt;% 
+* mutate(combn = (ets_n + ets_a + arima)/3) %&gt;%
+  reconcile(coherent = min_trace(combn)) %&gt;% 
+  forecast(h = "3 years")
+```
+
+### Intuitive interface for model combinations
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+library(fable)
+library(tidyverse)
+tsibble::tourism %&gt;%
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;%
+  model(ets_n = ETS(Trips ~ trend("N")), 
+        ens_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips)) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
+* reconcile(coherent = min_trace(combn)) %&gt;%
+  forecast(h = "3 years")
+```
+
+### Flexible forecast reconciliation without changing workflow
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+library(fable)
+library(tidyverse)
+tsibble::tourism %&gt;%
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;%
+  model(ets_n = ETS(Trips ~ trend("N")), 
+        ens_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips)) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
+  reconcile(coherent = min_trace(combn)) %&gt;%
+* forecast(h = "3 years")
+```
+
+### Distributional forecasts in a data format
+
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 512 512"&gt;&lt;path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/&gt;&lt;/svg&gt;]
+
+
+```r
+*library(fable)
+*library(tidyverse)
+*tsibble::tourism %&gt;%
+* aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %&gt;%
+* model(ets_n = ETS(Trips ~ trend("N")),
+*       ens_a = ETS(Trips ~ trend("A")),
+*       arima = ARIMA(Trips)) %&gt;%
+* mutate(combn = (ets_n + ets_a + arima)/3) %&gt;%
+* reconcile(coherent = min_trace(combn)) %&gt;%
+* forecast(h = "3 years")
+```
+
+### Reconciled ensemble forecasts for 425 series.
+
+--
+
+### 10 lines of code.
 
 ---
 
