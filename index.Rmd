@@ -359,7 +359,7 @@ fit %>%
 
 ### MASE: Mean absolute scaled error
 
-$$\text{MASE} = \dfrac{1}{T}\sum_{t = 1}^{T}\left|\frac{\displaystyle e_{j}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$
+$$\text{MASE} = \dfrac{1}{h}\sum_{t = T+1}^{T+h}\left|\frac{\displaystyle e_{t}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$
 
 ???
 
