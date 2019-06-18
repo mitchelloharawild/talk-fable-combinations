@@ -545,36 +545,6 @@ class: top
 
 # Model ensembling
 
-### A weighted average of forecasts
-
-.left-code[
-```{r tourism-total-combn-2, eval=FALSE, echo=TRUE}
-holiday_aus %>%
-  filter(Quarter < yearquarter("2015 Q1")) %>%  
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble( #<<
-      ets_n, ets_a, arima, #<<
-      weights = "inv_var") #<<
-  )
-```
-]
-.right-plot[
-```{r tourism-total-combn-2-output, ref.label="tourism-total-combn-2", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
-
----
-
-class: top
-
-# Model ensembling
-
 ### Is the combination better than its parts?
 
 .left-code[
@@ -586,10 +556,7 @@ holiday_aus %>%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   accuracy() %>% #<<
   arrange(MASE) #<<
 ```
@@ -616,10 +583,7 @@ holiday_aus %>%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   forecast(h = "3 years") %>% 
   autoplot(holiday_aus, level = NULL) #<<
 ```
@@ -647,10 +611,7 @@ holiday_aus %>%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   forecast(h = "3 years") %>% 
   accuracy(holiday_aus) %>% #<<
   arrange(MASE) #<<
@@ -706,10 +667,7 @@ fit <- tourism_aggregated %>%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %>% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  )
+  mutate(combn = (ets_n + ets_a + arima)/3)
 ```
 ```{r tourism-agg-mdl-print, echo = FALSE}
 fit
@@ -809,7 +767,7 @@ class: inverse, top
 
 ```{r, tourism-agg-mint, echo = TRUE}
 tourism_accuracy_reconciled <- fit %>% 
-  reconcile(coherent = min_trace(wt_combn)) %>% #<<
+  reconcile(coherent = min_trace(combn)) %>% #<<
   forecast(h = "3 years") %>% 
   accuracy(tourism_aggregated)
 ```
@@ -883,7 +841,7 @@ tsibble::tourism %>%
   forecast(h = "3 years")
 ```
 
-### Integrates seamlessly with the tidyverse
+### Integrates seamlessly with the tidyverse.
 
 ---
 class: inverse
@@ -905,7 +863,7 @@ tsibble::tourism %>% #<<
   forecast(h = "3 years")
 ```
 
-### Tidy temporal data suitable for the future of time series
+### Tidy temporal data suitable for the future of time series.
 
 ---
 class: inverse
@@ -927,7 +885,7 @@ tsibble::tourism %>%
   forecast(h = "3 years")
 ```
 
-### Flexible, and succinct model specification
+### Flexible, and succinct model specification.
 
 ---
 class: inverse
@@ -949,7 +907,7 @@ tsibble::tourism %>%
   forecast(h = "3 years")
 ```
 
-### Intuitive interface for model combinations
+### Intuitive interface for model combinations.
 
 ---
 class: inverse
@@ -971,7 +929,7 @@ tsibble::tourism %>%
   forecast(h = "3 years")
 ```
 
-### Flexible forecast reconciliation without changing workflow
+### Flexible forecast reconciliation without changing workflow.
 
 ---
 class: inverse
@@ -993,7 +951,7 @@ tsibble::tourism %>%
   forecast(h = "3 years") #<<
 ```
 
-### Distributional forecasts in a data format
+### Distributional forecasts in a data format.
 
 
 ---

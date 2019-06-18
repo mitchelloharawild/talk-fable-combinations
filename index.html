@@ -598,42 +598,6 @@ class: top
 
 # Model ensembling
 
-### A weighted average of forecasts
-
-.left-code[
-
-```r
-holiday_aus %&gt;%
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;%  
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-*   wt_combn = combination_ensemble(
-*     ets_n, ets_a, arima,
-*     weights = "inv_var")
-  )
-```
-]
-.right-plot[
-
-```
-#&gt; # A mable: 1 x 5
-#&gt;   ets_n        ets_a        arima                    combn         wt_combn     
-#&gt;   &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;       &lt;model&gt;      
-#&gt; 1 &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt; &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-```
-]
-
----
-
-class: top
-
-# Model ensembling
-
 ### Is the combination better than its parts?
 
 .left-code[
@@ -646,10 +610,7 @@ holiday_aus %&gt;%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
 * accuracy() %&gt;%
 * arrange(MASE)
 ```
@@ -657,14 +618,13 @@ holiday_aus %&gt;%
 .right-plot[
 
 ```
-#&gt; # A tibble: 5 x 9
-#&gt;   .model   .type         ME  RMSE   MAE    MPE  MAPE  MASE     ACF1
-#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-#&gt; 1 combn    Training  -12.0   414.  313. -0.294  3.34 0.785  0.00966
-#&gt; 2 wt_combn Training   33.8   421.  318.  0.193  3.37 0.797 -0.0404 
-#&gt; 3 ets_a    Training   63.2   423.  321.  0.515  3.41 0.805 -0.0504 
-#&gt; 4 ets_n    Training    4.48  422.  321. -0.128  3.41 0.805 -0.0218 
-#&gt; 5 arima    Training -104.    456.  337. -1.27   3.65 0.846  0.126
+#&gt; # A tibble: 4 x 9
+#&gt;   .model .type         ME  RMSE   MAE    MPE  MAPE  MASE     ACF1
+#&gt;   &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 combn  Training  -12.0   414.  313. -0.294  3.34 0.785  0.00966
+#&gt; 2 ets_a  Training   63.2   423.  321.  0.515  3.41 0.805 -0.0504 
+#&gt; 3 ets_n  Training    4.48  422.  321. -0.128  3.41 0.805 -0.0218 
+#&gt; 4 arima  Training -104.    456.  337. -1.27   3.65 0.846  0.126
 ```
 ]
 
@@ -686,10 +646,7 @@ holiday_aus %&gt;%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
   forecast(h = "3 years") %&gt;% 
 * autoplot(holiday_aus, level = NULL)
 ```
@@ -717,10 +674,7 @@ holiday_aus %&gt;%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  ) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
   forecast(h = "3 years") %&gt;% 
 * accuracy(holiday_aus) %&gt;%
 * arrange(MASE)
@@ -729,14 +683,13 @@ holiday_aus %&gt;%
 .right-plot[
 
 ```
-#&gt; # A tibble: 5 x 9
-#&gt;   .model   .type    ME  RMSE   MAE   MPE  MAPE  MASE  ACF1
-#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1 ets_a    Test   581.  700.  581.  5.36  5.36  1.46 0.304
-#&gt; 2 wt_combn Test   760.  878.  760.  7.03  7.03  1.91 0.364
-#&gt; 3 combn    Test   927. 1042.  927.  8.57  8.57  2.33 0.390
-#&gt; 4 ets_n    Test   939. 1061.  939.  8.69  8.69  2.36 0.415
-#&gt; 5 arima    Test  1261. 1380. 1261. 11.7  11.7   3.16 0.425
+#&gt; # A tibble: 4 x 9
+#&gt;   .model .type    ME  RMSE   MAE   MPE  MAPE  MASE  ACF1
+#&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 ets_a  Test   581.  700.  581.  5.36  5.36  1.46 0.304
+#&gt; 2 combn  Test   927. 1042.  927.  8.57  8.57  2.33 0.390
+#&gt; 3 ets_n  Test   939. 1061.  939.  8.69  8.69  2.36 0.415
+#&gt; 4 arima  Test  1261. 1380. 1261. 11.7  11.7   3.16 0.425
 ```
 ]
 
@@ -821,27 +774,24 @@ fit &lt;- tourism_aggregated %&gt;%
     ets_a = ETS(Trips ~ trend("A")),
     arima = ARIMA(Trips)
   ) %&gt;% 
-  mutate(
-    combn = (ets_n + ets_a + arima)/3,
-    wt_combn = combination_ensemble(ets_n, ets_a, arima, weights = "inv_var")
-  )
+  mutate(combn = (ets_n + ets_a + arima)/3)
 ```
 
 ```
-#&gt; # A mable: 425 x 8
+#&gt; # A mable: 425 x 7
 #&gt; # Key:     State, Region, Purpose [425]
-#&gt;    State   Region  Purpose  ets_n        ets_a        arima                            combn         wt_combn     
-#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                          &lt;model&gt;       &lt;model&gt;      
-#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(1,0,1)(1,1,0)[4]&gt;         &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt;         &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt;         &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt; &lt;COMBINATION&gt;
-#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(A,N,N)&gt; &lt;ETS(A,A,N)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;           &lt;COMBINATION&gt; &lt;COMBINATION&gt;
+#&gt;    State   Region  Purpose  ets_n        ets_a        arima                            combn        
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                          &lt;model&gt;      
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(1,0,1)(1,1,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
+#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt;
+#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt;
+#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
+#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(A,N,N)&gt; &lt;ETS(A,A,N)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
 #&gt; # … with 415 more rows
 ```
 
@@ -858,7 +808,7 @@ tourism_accuracy &lt;- accuracy(fit)
 ```
 
 ```
-#&gt; # A tibble: 2,125 x 12
+#&gt; # A tibble: 1,700 x 12
 #&gt;    State   Region  Purpose  .model .type          ME  RMSE    MAE     MPE  MAPE  MASE      ACF1
 #&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
 #&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  ets_n  Training 80.2     824.  634.     0.243  3.04 0.691 -0.0340  
@@ -871,7 +821,7 @@ tourism_accuracy &lt;- accuracy(fit)
 #&gt;  8 ACT     &lt;total&gt; Holiday  ets_n  Training  0.391    37.9  27.5   -4.09  18.9  0.824  0.173   
 #&gt;  9 ACT     &lt;total&gt; Other    ets_n  Training  0.00226  11.4   9.59 -20.9   44.1  0.768 -0.0276  
 #&gt; 10 ACT     &lt;total&gt; Visiting ets_n  Training -0.00366  28.7  21.9   -2.33  12.1  0.663  0.207   
-#&gt; # … with 2,115 more rows
+#&gt; # … with 1,690 more rows
 ```
 
 ---
@@ -890,14 +840,13 @@ tourism_accuracy %&gt;%
 ```
 
 ```
-#&gt; # A tibble: 5 x 8
-#&gt;   .model          ME  RMSE   MAE   MPE  MAPE  MASE     ACF1
-#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-#&gt; 1 combn    -1.77e- 2  14.6  11.3 -9.78  25.9 0.727  0.00268
-#&gt; 2 wt_combn -2.05e- 2  14.5  11.4 -9.72  26.0 0.730  0.00568
-#&gt; 3 ets_n     1.51e- 4  14.5  11.6 -8.71  25.9 0.738  0.00878
-#&gt; 4 ets_a    -1.12e- 1  14.6  11.6 NA     26.2 0.743  0.0116 
-#&gt; 5 arima     8.30e-16  15.2  11.6 NA     27.2 0.754 -0.00750
+#&gt; # A tibble: 4 x 8
+#&gt;   .model        ME  RMSE   MAE   MPE  MAPE  MASE     ACF1
+#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 combn  -1.77e- 2  14.6  11.3 -9.78  25.9 0.727  0.00268
+#&gt; 2 ets_n   1.51e- 4  14.5  11.6 -8.71  25.9 0.738  0.00878
+#&gt; 3 ets_a  -1.12e- 1  14.6  11.6 NA     26.2 0.743  0.0116 
+#&gt; 4 arima   8.30e-16  15.2  11.6 NA     27.2 0.754 -0.00750
 ```
 
 ---
@@ -934,14 +883,13 @@ tourism_accuracy_fc %&gt;%
 ```
 
 ```
-#&gt; # A tibble: 5 x 8
-#&gt;   .model      ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
-#&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 ets_n     8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
-#&gt; 2 wt_combn  7.66  19.1  15.4  6.74  25.2 0.986 -0.0834
-#&gt; 3 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
-#&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
-#&gt; 5 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
+#&gt; # A tibble: 4 x 8
+#&gt;   .model    ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
+#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 ets_n   8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
+#&gt; 2 combn   8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
+#&gt; 3 ets_a   7.65  20.2  15.8 NA     26.0 1.03  -0.0733
+#&gt; 4 arima   9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
 
 ---
@@ -985,14 +933,14 @@ class: inverse, top
 
 ```r
 tourism_accuracy_reconciled &lt;- fit %&gt;% 
-* reconcile(coherent = min_trace(wt_combn)) %&gt;%
+* reconcile(coherent = min_trace(combn)) %&gt;%
   forecast(h = "3 years") %&gt;% 
   accuracy(tourism_aggregated)
 ```
 
 
 ```
-#&gt; # A tibble: 2,550 x 12
+#&gt; # A tibble: 2,125 x 12
 #&gt;    .model State   Region  Purpose  .type     ME   RMSE    MAE   MPE  MAPE  MASE     ACF1
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
 #&gt;  1 arima  &lt;total&gt; &lt;total&gt; &lt;total&gt;  Test  1397.  1795.  1452.   5.31  5.54 1.58   0.496  
@@ -1005,7 +953,7 @@ tourism_accuracy_reconciled &lt;- fit %&gt;%
 #&gt;  8 arima  ACT     &lt;total&gt; Holiday  Test    40.8   52.8   44.2 18.9  21.5  1.33   0.150  
 #&gt;  9 arima  ACT     &lt;total&gt; Other    Test    12.2   18.1   13.9 22.3  31.2  1.11   0.0980 
 #&gt; 10 arima  ACT     &lt;total&gt; Visiting Test    33.6   49.8   38.7 13.4  16.4  1.17   0.0407 
-#&gt; # … with 2,540 more rows
+#&gt; # … with 2,115 more rows
 ```
 
 
@@ -1022,15 +970,14 @@ tourism_accuracy_reconciled %&gt;%
 ```
 
 ```
-#&gt; # A tibble: 6 x 8
+#&gt; # A tibble: 5 x 8
 #&gt;   .model      ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
 #&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 coherent  5.47  18.2  14.2 NA     23.1 0.933 -0.0821
+#&gt; 1 coherent  6.34  18.2  14.6 NA     22.6 0.934 -0.0834
 #&gt; 2 ets_n     8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
-#&gt; 3 wt_combn  7.66  19.1  15.4  6.74  25.2 0.986 -0.0834
-#&gt; 4 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
-#&gt; 5 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
-#&gt; 6 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
+#&gt; 3 combn     8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
+#&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
+#&gt; 5 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
 
 ---
@@ -1091,7 +1038,7 @@ tsibble::tourism %&gt;%
   forecast(h = "3 years")
 ```
 
-### Integrates seamlessly with the tidyverse
+### Integrates seamlessly with the tidyverse.
 
 ---
 class: inverse
@@ -1114,7 +1061,7 @@ library(tidyverse)
   forecast(h = "3 years")
 ```
 
-### Tidy temporal data suitable for the future of time series
+### Tidy temporal data suitable for the future of time series.
 
 ---
 class: inverse
@@ -1137,7 +1084,7 @@ tsibble::tourism %&gt;%
   forecast(h = "3 years")
 ```
 
-### Flexible, and succinct model specification
+### Flexible, and succinct model specification.
 
 ---
 class: inverse
@@ -1160,7 +1107,7 @@ tsibble::tourism %&gt;%
   forecast(h = "3 years")
 ```
 
-### Intuitive interface for model combinations
+### Intuitive interface for model combinations.
 
 ---
 class: inverse
@@ -1183,7 +1130,7 @@ tsibble::tourism %&gt;%
   forecast(h = "3 years")
 ```
 
-### Flexible forecast reconciliation without changing workflow
+### Flexible forecast reconciliation without changing workflow.
 
 ---
 class: inverse
@@ -1206,7 +1153,7 @@ tsibble::tourism %&gt;%
 * forecast(h = "3 years")
 ```
 
-### Distributional forecasts in a data format
+### Distributional forecasts in a data format.
 
 
 ---
