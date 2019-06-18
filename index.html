@@ -409,40 +409,6 @@ class: top
 
 # Comparing multiple models
 
-### In-sample training accuracy
-
-.left-code[
-
-```r
-holiday_aus %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-* accuracy() %&gt;%
-* arrange(MASE)
-```
-]
-.right-plot[
-
-```
-#&gt; # A tibble: 3 x 9
-#&gt;   .model .type         ME  RMSE   MAE    MPE  MAPE  MASE    ACF1
-#&gt;   &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 ets_a  Training   63.2   423.  321.  0.515  3.41 0.805 -0.0504
-#&gt; 2 ets_n  Training    4.48  422.  321. -0.128  3.41 0.805 -0.0218
-#&gt; 3 arima  Training -104.    456.  337. -1.27   3.65 0.846  0.126
-```
-]
-
----
-
-class: top
-
-# Comparing multiple models
-
 ### Forecasts from multiple models
 
 .left-code[
@@ -469,7 +435,7 @@ class: top
 
 # Comparing multiple models
 
-### Out-of-sample forecast accuracy
+### Forecast accuracy
 
 .left-code[
 
@@ -602,45 +568,7 @@ class: top
 
 # Model ensembling
 
-### Is it better? In-sample training accuracy
-
---
-
-.left-code[
-
-```r
-holiday_aus %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
-* accuracy() %&gt;%
-* arrange(MASE)
-```
-]
-.right-plot[
-
-```
-#&gt; # A tibble: 4 x 9
-#&gt;   .model .type         ME  RMSE   MAE    MPE  MAPE  MASE     ACF1
-#&gt;   &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-#&gt; 1 combn  Training  -12.0   414.  313. -0.294  3.34 0.785  0.00966
-#&gt; 2 ets_a  Training   63.2   423.  321.  0.515  3.41 0.805 -0.0504 
-#&gt; 3 ets_n  Training    4.48  422.  321. -0.128  3.41 0.805 -0.0218 
-#&gt; 4 arima  Training -104.    456.  337. -1.27   3.65 0.846  0.126
-```
-]
-
----
-
-class: top
-
-# Model ensembling
-
-### Great! How about the forecasts?
+### Is it better? Check the forecasts.
 
 --
 
@@ -819,76 +747,7 @@ fc &lt;- fit %&gt;% forecast(h = "3 years")
 
 # Are the combinations better?
 
-### In-sample training accuracy
-
-
-```r
-tourism_accuracy &lt;- accuracy(fit)
-```
-
-```
-#&gt; # A tibble: 1,700 x 12
-#&gt;    State   Region  Purpose  .model .type          ME  RMSE    MAE     MPE  MAPE  MASE      ACF1
-#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  ets_n  Training 80.2     824.  634.     0.243  3.04 0.691 -0.0340  
-#&gt;  2 &lt;total&gt; &lt;total&gt; Business ets_n  Training 21.8     284.  213.     0.117  5.46 0.718 -0.00187 
-#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  ets_n  Training  4.48    422.  321.    -0.128  3.41 0.805 -0.0218  
-#&gt;  4 &lt;total&gt; &lt;total&gt; Other    ets_n  Training 12.4      98.1  79.1    0.323  9.07 0.669  0.0528  
-#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting ets_n  Training 27.9     334.  263.     0.203  3.92 0.633 -0.0607  
-#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  ets_n  Training  0.0171   60.1  50.0   -1.51  10.3  0.726  0.140   
-#&gt;  7 ACT     &lt;total&gt; Business ets_n  Training  0.0233   30.4  25.2   -4.67  18.8  0.687 -0.000371
-#&gt;  8 ACT     &lt;total&gt; Holiday  ets_n  Training  0.391    37.9  27.5   -4.09  18.9  0.824  0.173   
-#&gt;  9 ACT     &lt;total&gt; Other    ets_n  Training  0.00226  11.4   9.59 -20.9   44.1  0.768 -0.0276  
-#&gt; 10 ACT     &lt;total&gt; Visiting ets_n  Training -0.00366  28.7  21.9   -2.33  12.1  0.663  0.207   
-#&gt; # … with 1,690 more rows
-```
-
----
-
-# Are the combinations better?
-
-
-### In-sample training accuracy
-
-
-```r
-tourism_accuracy %&gt;% 
-  group_by(.model) %&gt;%
-  summarise_at(vars(ME:ACF1), median) %&gt;% 
-  arrange(MASE)
-```
-
-```
-#&gt; # A tibble: 4 x 8
-#&gt;   .model        ME  RMSE   MAE   MPE  MAPE  MASE     ACF1
-#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-#&gt; 1 combn  -1.77e- 2  14.6  11.3 -9.78  25.9 0.727  0.00268
-#&gt; 2 ets_n   1.51e- 4  14.5  11.6 -8.71  25.9 0.738  0.00878
-#&gt; 3 ets_a  -1.12e- 1  14.6  11.6 NA     26.2 0.743  0.0116 
-#&gt; 4 arima   8.30e-16  15.2  11.6 NA     27.2 0.754 -0.00750
-```
-
----
-
-# Are the combinations better?
-
-### In-sample training accuracy
-
-
-```r
-tourism_accuracy %&gt;% 
-  ggplot(aes(x = MASE, colour = .model)) +
-  geom_density() + scale_x_log10()
-```
-
-&lt;img src="figure/tourism-agg-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
-
-
----
-
-# Are the combinations better?
-
-### Out-of-sample forecast accuracy
+### Forecast accuracy
 
 
 ```r
@@ -909,22 +768,6 @@ tourism_accuracy_fc %&gt;%
 #&gt; 3 ets_a   7.65  20.2  15.8 NA     26.0 1.03  -0.0733
 #&gt; 4 arima   9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
-
----
-
-# Are the combinations better?
-
-### Out-of-sample forecast accuracy
-
-
-```r
-tourism_accuracy_fc %&gt;% 
-  ggplot(aes(x = MASE, colour = .model)) +
-  geom_density() + scale_x_log10()
-```
-
-&lt;img src="figure/tourism-agg-fc-acc-plot-1.svg" style="display: block; margin: auto;" /&gt;
-
 
 ---
 class: inverse, top
@@ -984,6 +827,9 @@ tourism_accuracy_reconciled &lt;- fit %&gt;%
 #&gt; # … with 2,115 more rows
 ```
 
+.bottom[
+#### (Interface for reconciliation is still experimental.)
+]
 
 ---
 
@@ -1007,19 +853,6 @@ tourism_accuracy_reconciled %&gt;%
 #&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
 #&gt; 5 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
-
----
-
-# Forecast reconciliation
-
-
-```r
-tourism_accuracy_reconciled %&gt;% 
-  ggplot(aes(x = MASE, colour = .model)) +
-  geom_density() + scale_x_log10()
-```
-
-&lt;img src="figure/tourism-agg-acc-mint-plot-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 class: inverse
@@ -1206,10 +1039,6 @@ class: inverse
 ```
 
 ### Reconciled ensemble forecasts for 425 series.
-
---
-
-### 10 lines of code.
 
 ---
 

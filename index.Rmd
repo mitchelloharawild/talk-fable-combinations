@@ -392,32 +392,6 @@ class: top
 
 # Comparing multiple models
 
-### In-sample training accuracy
-
-.left-code[
-```{r tourism-total-many-acc, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  accuracy() %>% #<<
-  arrange(MASE) #<<
-```
-]
-.right-plot[
-```{r tourism-total-many-acc-output, ref.label="tourism-total-many-acc", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
-
----
-
-class: top
-
-# Comparing multiple models
-
 ### Forecasts from multiple models
 
 .left-code[
@@ -444,7 +418,7 @@ class: top
 
 # Comparing multiple models
 
-### Out-of-sample forecast accuracy
+### Forecast accuracy
 
 .left-code[
 ```{r tourism-total-many-fc-acc, eval=FALSE, echo=TRUE}
@@ -545,36 +519,7 @@ class: top
 
 # Model ensembling
 
-### Is it better? In-sample training accuracy
-
---
-
-.left-code[
-```{r tourism-total-combn-acc, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  accuracy() %>% #<<
-  arrange(MASE) #<<
-```
-]
-.right-plot[
-```{r tourism-total-combn-acc-output, ref.label="tourism-total-combn-acc", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
-
----
-
-class: top
-
-# Model ensembling
-
-### Great! How about the forecasts?
+### Is it better? Check the forecasts.
 
 --
 
@@ -697,47 +642,7 @@ fc %>%
 
 # Are the combinations better?
 
-### In-sample training accuracy
-
-```{r tourism-agg-acc, echo = TRUE, cache = TRUE}
-tourism_accuracy <- accuracy(fit)
-```
-```{r tourism-agg-acc-print, echo = FALSE}
-tourism_accuracy
-```
-
----
-
-# Are the combinations better?
-
-
-### In-sample training accuracy
-
-```{r tourism-agg-acc-central, echo = TRUE, cache = TRUE}
-tourism_accuracy %>% 
-  group_by(.model) %>%
-  summarise_at(vars(ME:ACF1), median) %>% 
-  arrange(MASE)
-```
-
----
-
-# Are the combinations better?
-
-### In-sample training accuracy
-
-```{r tourism-agg-acc-plot, echo = TRUE, cache = TRUE}
-tourism_accuracy %>% 
-  ggplot(aes(x = MASE, colour = .model)) +
-  geom_density() + scale_x_log10()
-```
-
-
----
-
-# Are the combinations better?
-
-### Out-of-sample forecast accuracy
+### Forecast accuracy
 
 ```{r tourism-agg-fc-acc, echo = TRUE, cache = TRUE}
 tourism_accuracy_fc <- fc %>% 
@@ -747,19 +652,6 @@ tourism_accuracy_fc %>%
   summarise_at(vars(ME:ACF1), median) %>% 
   arrange(MASE)
 ```
-
----
-
-# Are the combinations better?
-
-### Out-of-sample forecast accuracy
-
-```{r tourism-agg-fc-acc-plot, echo = TRUE, cache = TRUE}
-tourism_accuracy_fc %>% 
-  ggplot(aes(x = MASE, colour = .model)) +
-  geom_density() + scale_x_log10()
-```
-
 
 ---
 class: inverse, top
@@ -808,6 +700,9 @@ tourism_accuracy_reconciled <- fit %>%
 tourism_accuracy_reconciled
 ```
 
+.bottom[
+#### (Interface for reconciliation is still experimental.)
+]
 
 ---
 
@@ -818,16 +713,6 @@ tourism_accuracy_reconciled %>%
   group_by(.model) %>%
   summarise_at(vars(ME:ACF1), median) %>% 
   arrange(MASE)
-```
-
----
-
-# Forecast reconciliation
-
-```{r tourism-agg-acc-mint-plot, echo = TRUE, cache = TRUE}
-tourism_accuracy_reconciled %>% 
-  ggplot(aes(x = MASE, colour = .model)) +
-  geom_density() + scale_x_log10()
 ```
 
 ---
@@ -1007,10 +892,6 @@ tsibble::tourism %>% #<<
 ```
 
 ### Reconciled ensemble forecasts for 425 series.
-
---
-
-### 10 lines of code.
 
 ---
 
