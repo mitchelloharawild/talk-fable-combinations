@@ -545,7 +545,9 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### Is it better? In-sample training accuracy
+
+--
 
 .left-code[
 ```{r tourism-total-combn-acc, eval=FALSE, echo=TRUE}
@@ -572,7 +574,9 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### Great! How about the forecasts?
+
+--
 
 .left-code[
 ```{r tourism-total-combn-plot, eval=FALSE, echo=TRUE}
@@ -600,7 +604,7 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### Is it better? Out-of-sample forecast accuracy
 
 .left-code[
 ```{r tourism-total-combn-fc-acc, eval=FALSE, echo=TRUE}
@@ -673,6 +677,21 @@ fit <- tourism_aggregated %>%
 fit
 ```
 
+---
+
+## Producing forecasts are no different
+
+```{r fc-agg-fc-plot, echo = TRUE}
+fc <- fit %>% forecast(h = "3 years")
+```
+.full-width[
+```{r fc-agg-fc-plot-out, echo = FALSE, fig.height=6}
+fc %>% 
+  filter(is_aggregated(State), is_aggregated(Region)) %>% 
+  select(-State, -Region) %>% 
+  autoplot(aggregate_key(tourism, Purpose, Trips = sum(Trips)))
+```
+]
 
 ---
 
@@ -721,8 +740,7 @@ tourism_accuracy %>%
 ### Out-of-sample forecast accuracy
 
 ```{r tourism-agg-fc-acc, echo = TRUE, cache = TRUE}
-tourism_accuracy_fc <- fit %>% 
-  forecast(h = "3 years") %>% 
+tourism_accuracy_fc <- fc %>% 
   accuracy(tourism_aggregated)
 tourism_accuracy_fc %>% 
   group_by(.model) %>%
@@ -765,9 +783,23 @@ class: inverse, top
 
 # Forecast reconciliation
 
+```{r}
+library(collapsibleTree)
+collapsibleTree(key_data(tourism), root = "Total Tourism", 
+                hierarchy = c("Purpose", "State", "Region"),
+                zoomable = FALSE)
+```
+
+
+---
+
+# Forecast reconciliation
+
+## MinT with covariance shrink
+
 ```{r, tourism-agg-mint, echo = TRUE}
 tourism_accuracy_reconciled <- fit %>% 
-  reconcile(coherent = min_trace(combn)) %>% #<<
+  reconcile(coherent = min_trace(combn, method = "shrink")) %>% #<<
   forecast(h = "3 years") %>% 
   accuracy(tourism_aggregated)
 ```

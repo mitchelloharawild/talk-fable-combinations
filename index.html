@@ -598,7 +598,9 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### Is it better? In-sample training accuracy
+
+--
 
 .left-code[
 
@@ -634,7 +636,9 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### Great! How about the forecasts?
+
+--
 
 .left-code[
 
@@ -662,7 +666,7 @@ class: top
 
 # Model ensembling
 
-### Is the combination better than its parts?
+### Is it better? Out-of-sample forecast accuracy
 
 .left-code[
 
@@ -795,6 +799,17 @@ fit &lt;- tourism_aggregated %&gt;%
 #&gt; # … with 415 more rows
 ```
 
+---
+
+## Producing forecasts are no different
+
+
+```r
+fc &lt;- fit %&gt;% forecast(h = "3 years")
+```
+.full-width[
+&lt;img src="figure/fc-agg-fc-plot-out-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
@@ -873,8 +888,7 @@ tourism_accuracy %&gt;%
 
 
 ```r
-tourism_accuracy_fc &lt;- fit %&gt;% 
-  forecast(h = "3 years") %&gt;% 
+tourism_accuracy_fc &lt;- fc %&gt;% 
   accuracy(tourism_aggregated)
 tourism_accuracy_fc %&gt;% 
   group_by(.model) %&gt;%
