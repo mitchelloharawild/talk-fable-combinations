@@ -787,7 +787,7 @@ class: inverse, top
 library(collapsibleTree)
 collapsibleTree(key_data(tourism), root = "Total Tourism", 
                 hierarchy = c("Purpose", "State", "Region"),
-                zoomable = FALSE)
+                zoomable = FALSE, height = 550, fontSize = 14, width = "100%")
 ```
 
 
