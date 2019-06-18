@@ -587,9 +587,18 @@ tourism
 
 ---
 
-# But wait, there's more!
+# But wait, there's more! Aggregations over keys.
 
-### We can also model the aggregations
+```{r}
+library(collapsibleTree)
+collapsibleTree(key_data(tourism), root = "Total Tourism", 
+                hierarchy = c("Purpose", "State", "Region"),
+                zoomable = FALSE, height = 550, fontSize = 14, width = "100%")
+```
+
+---
+
+# Consider _all_ series in the data...
 
 ```{r tourism-agg, echo = TRUE}
 tourism_aggregated <- tourism %>% 
@@ -636,7 +645,7 @@ fc <- fit %>% forecast(h = "3 years")
 fc %>% 
   filter(is_aggregated(State), is_aggregated(Region)) %>% 
   select(-State, -Region) %>% 
-  autoplot(aggregate_key(tourism, Purpose, Trips = sum(Trips)))
+  autoplot(aggregate_key(tourism, Purpose, Trips = sum(Trips)), level = NULL)
 ```
 ]
 
@@ -692,10 +701,9 @@ collapsibleTree(key_data(tourism), root = "Total Tourism",
 ## MinT with covariance shrink
 
 ```{r, tourism-agg-mint, echo = TRUE}
-tourism_accuracy_reconciled <- fit %>% 
+tourism_fc_reconciled <- fit %>% 
   reconcile(coherent = min_trace(combn, method = "shrink")) %>% #<<
-  forecast(h = "3 years") %>% 
-  accuracy(tourism_aggregated)
+  forecast(h = "3 years")
 ```
 
 ```{r tourism-agg-mint-out}
@@ -711,7 +719,8 @@ tourism_accuracy_reconciled
 # Forecast reconciliation
 
 ```{r, tourism-agg-mint-median-out, echo=TRUE}
-tourism_accuracy_reconciled %>% 
+tourism_fc_reconciled %>% 
+  accuracy(tourism_aggregated) %>% 
   group_by(.model) %>%
   summarise_at(vars(ME:ACF1), median) %>% 
   arrange(MASE)
