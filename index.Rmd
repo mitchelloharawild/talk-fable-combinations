@@ -551,7 +551,7 @@ class: top
 
 # Model ensembling
 
-### Is it better? Out-of-sample forecast accuracy
+### Is it better? Forecast accuracy
 
 .left-code[
 ```{r tourism-total-combn-fc-acc, eval=FALSE, echo=TRUE}
@@ -698,7 +698,7 @@ collapsibleTree(key_data(tourism), root = "Total Tourism",
 
 # Forecast reconciliation
 
-## MinT with covariance shrink
+### MinT with covariance shrink
 
 ```{r, tourism-agg-mint, echo = TRUE}
 tourism_fc_reconciled <- fit %>% 
@@ -717,6 +717,8 @@ tourism_accuracy_reconciled
 ---
 
 # Forecast reconciliation
+
+### Is it better? Forecast accuracy
 
 ```{r, tourism-agg-mint-median-out, echo=TRUE}
 tourism_fc_reconciled %>% 
@@ -905,6 +907,30 @@ tsibble::tourism %>% #<<
 ### Reconciled ensemble forecasts for 425 series.
 
 ---
+class: inverse, center
+
+# Work completed with help from
+
+.pull-left[
+.face-border[![Rob Hyndman](https://pbs.twimg.com/profile_images/1103150025981321216/dV3Wz_ql_400x400.png)]
+
+Rob Hyndman
+]
+.pull-right[
+.face-border[![Earo Wang](https://pbs.twimg.com/profile_images/1122341439063519233/YanRXXLu_400x400.jpg)]
+
+Earo Wang
+]
+
+--
+
+### Join our group.
+
+Monash University is now hiring in business analytics.
+
+See [bit.ly/monash-ba](bit.ly/monash-ba) for details.
+
+---
 
 class: inverse, top
 
@@ -915,7 +941,7 @@ class: inverse, top
 <br>
 
 .larger[
-`r fa("github", fill = "white")` Learn more on GitHub: [tidyverts/fable](https://github.com/tidyverts/fable)
+`r fa("globe", fill = "white")` Learn more: [fable.tidyverts.org](https://fable.tidyverts.org/)
 
 `r fa("chart-line", fill = "white")` Keep updated: [tidyverts.org](http://www.tidyverts.org)
 
@@ -923,5 +949,5 @@ class: inverse, top
 
 <br>
 
-.footnote[This work is licensed as `r fa("creative-commons", fill="white")` BY-NC 4.0.]
+.bottom[This work is licensed as `r fa("creative-commons", fill="white")` BY-NC 4.0.]
 ]
