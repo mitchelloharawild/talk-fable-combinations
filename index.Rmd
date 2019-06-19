@@ -611,7 +611,7 @@ tourism_aggregated
 
 ---
 
-# This may take a while...
+# Modelling may take a while...
 
 --
 
@@ -620,7 +620,7 @@ tourism_aggregated
 ```{r tourism-agg-mdl, echo = TRUE, cache = TRUE}
 library(future) #<<
 plan(multiprocess) #<<
-fit <- tourism_aggregated %>%
+tourism_fit <- tourism_aggregated %>%
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -630,7 +630,7 @@ fit <- tourism_aggregated %>%
   mutate(combn = (ets_n + ets_a + arima)/3)
 ```
 ```{r tourism-agg-mdl-print, echo = FALSE}
-fit
+tourism_fit
 ```
 
 ---
@@ -638,11 +638,11 @@ fit
 ## Producing forecasts are no different
 
 ```{r fc-agg-fc-plot, echo = TRUE}
-fc <- fit %>% forecast(h = "3 years")
+tourism_fc <- tourism_fit %>% forecast(h = "3 years")
 ```
 .full-width[
 ```{r fc-agg-fc-plot-out, echo = FALSE, fig.height=6}
-fc %>% 
+tourism_fc %>% 
   filter(is_aggregated(State), is_aggregated(Region)) %>% 
   select(-State, -Region) %>% 
   autoplot(aggregate_key(tourism, Purpose, Trips = sum(Trips)), level = NULL)
@@ -655,12 +655,23 @@ fc %>%
 
 ### Forecast accuracy
 
+```{r tourism-agg-fc-acc-direct, echo = TRUE, cache = TRUE}
+tourism_fc %>% 
+  accuracy(tourism_aggregated) %>% #<<
+  arrange(MASE) #<<
+```
+
+---
+
+# Are the combinations better?
+
+### Forecast accuracy
+
 ```{r tourism-agg-fc-acc, echo = TRUE, cache = TRUE}
-tourism_accuracy_fc <- fc %>% 
-  accuracy(tourism_aggregated)
-tourism_accuracy_fc %>% 
-  group_by(.model) %>%
-  summarise_at(vars(ME:ACF1), median) %>% 
+tourism_fc %>% 
+  accuracy(tourism_aggregated) %>% 
+  group_by(.model) %>% #<<
+  summarise_at(vars(ME:ACF1), median) %>% #<<
   arrange(MASE)
 ```
 
@@ -700,15 +711,16 @@ collapsibleTree(key_data(tourism), root = "Total Tourism",
 
 ### MinT with covariance shrink
 
-```{r, tourism-agg-mint, echo = TRUE}
-tourism_fc_reconciled <- fit %>% 
+```{r, tourism-agg-mint-fc, echo = TRUE}
+tourism_fc_reconciled <- tourism_fit %>% 
   reconcile(coherent = min_trace(combn, method = "shrink")) %>% #<<
   forecast(h = "3 years")
 ```
 
-```{r tourism-agg-mint-out}
-tourism_accuracy_reconciled
+```{r, tourism-agg-mint-fc-out}
+tourism_fc_reconciled
 ```
+
 
 .bottom[
 #### (Interface for reconciliation is still experimental.)
