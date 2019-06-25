@@ -457,6 +457,43 @@ t(y) ~ {model specification}
 
 ---
 
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with fable
+
+### Specify and estimate some model(s)
+
+```{r tourism-total-ets-custom-model, echo=TRUE}
+holiday_aus %>% 
+  model(
+    custom = ETS(log(Trips) ~ error("A") + trend("A") + season("A")), #<<
+    auto = ETS(Trips)
+  )
+```
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with fable
+
+### Specify and estimate some model(s)
+
+```{r tourism-total-ets-custom-model-fc, echo=TRUE}
+holiday_aus %>% 
+  model(
+    custom = ETS(log(Trips) ~ error("A") + trend("A") + season("A")),
+    auto = ETS(Trips)
+  ) %>% 
+  forecast() #<<
+```
+
+---
+
 class: top, inverse
 
 .sticker-float[![fable](resources/fable.svg)]

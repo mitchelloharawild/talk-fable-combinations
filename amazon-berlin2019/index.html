@@ -578,6 +578,75 @@ t(y) ~ {model specification}
 
 ---
 
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with fable
+
+### Specify and estimate some model(s)
+
+
+```r
+holiday_aus %&gt;% 
+  model(
+*   custom = ETS(log(Trips) ~ error("A") + trend("A") + season("A")),
+    auto = ETS(Trips)
+  )
+```
+
+```
+#&gt; # A mable: 1 x 2
+#&gt;   custom       auto        
+#&gt;   &lt;model&gt;      &lt;model&gt;     
+#&gt; 1 &lt;ETS(A,A,A)&gt; &lt;ETS(M,N,M)&gt;
+```
+
+---
+
+class: top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+# Forecasting with fable
+
+### Specify and estimate some model(s)
+
+
+```r
+holiday_aus %&gt;% 
+  model(
+    custom = ETS(log(Trips) ~ error("A") + trend("A") + season("A")),
+    auto = ETS(Trips)
+  ) %&gt;% 
+* forecast()
+```
+
+```
+#&gt; # A fable: 16 x 4 [1Q]
+#&gt; # Key:     .model [2]
+#&gt;    .model Quarter  Trips .distribution    
+#&gt;    &lt;chr&gt;    &lt;qtr&gt;  &lt;dbl&gt; &lt;dist&gt;           
+#&gt;  1 custom 2018 Q1 13413. t(N(9.5, 0.0021))
+#&gt;  2 custom 2018 Q2 11304. t(N(9.3, 0.0024))
+#&gt;  3 custom 2018 Q3 10982. t(N(9.3, 0.0028))
+#&gt;  4 custom 2018 Q4 11269. t(N(9.3, 0.0033))
+#&gt;  5 custom 2019 Q1 14033. t(N(9.5, 0.0038))
+#&gt;  6 custom 2019 Q2 11828. t(N(9.4, 0.0044))
+#&gt;  7 custom 2019 Q3 11494. t(N(9.3, 0.0051))
+#&gt;  8 custom 2019 Q4 11795. t(N(9.4, 0.0059))
+#&gt;  9 auto   2018 Q1 13088. N(13088, 368663) 
+#&gt; 10 auto   2018 Q2 10909. N(10909, 288993) 
+#&gt; 11 auto   2018 Q3 10442. N(10442, 294873) 
+#&gt; 12 auto   2018 Q4 10624. N(10624, 336446) 
+#&gt; 13 auto   2019 Q1 13088. N(13088, 558216) 
+#&gt; 14 auto   2019 Q2 10909. N(10909, 420721) 
+#&gt; 15 auto   2019 Q3 10442. N(10442, 415586) 
+#&gt; 16 auto   2019 Q4 10624. N(10624, 461447)
+```
+
+---
+
 class: top, inverse
 
 .sticker-float[![fable](resources/fable.svg)]
