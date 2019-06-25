@@ -100,13 +100,12 @@ theme_set(
 .title[fable]
 .sticker-float[![fable](resources/fable.svg)]
 
-## Flexible futures for fable functionality
+## fable and the tidyverts
 
 .bottom[
 ### Mitchell O'Hara-Wild (`r fa("twitter", fill="#1da1f2")`[@mitchoharawild](https://twitter.com/mitchoharawild))
-### Rob Hyndman (`r fa("twitter", fill="#1da1f2")`[@robjhyndman](https://twitter.com/robjhyndman/))
-### 19 June 2019
-### Slides @ [slides.mitchelloharawild.com/isf2019](https://slides.mitchelloharawild.com/isf2019)
+### 25 June 2019
+### Slides @ [slides.mitchelloharawild.com/amazon-berlin2019](https://slides.mitchelloharawild.com/amazon-berlin2019)
 ]
 
 ---
@@ -149,27 +148,6 @@ class: center
 
 ---
 
-## Formula model specification
-
-To simplify model building, we use a model formula.
-This should be more familiar to those who have done regression modelling.
-
-```{r model-spec, eval = FALSE, echo = TRUE}
-t(y) ~ {model specification}
-```
-
-### LHS: Response
-* Defines the response variable from the data
-* Specification of transformations
-  (which are automatically back-transformed)
-
-### RHS: Specials
-* Model specific special functions
-* Exogenous regressors (if supported by model)
-
-
----
-
 class: top
 
 .sticker-float[![tsibble](resources/tsibble.svg)]
@@ -179,12 +157,10 @@ class: top
 
 ### From `ts` to `tsibble`
 
-```{r co2}
+```{r co2, echo = TRUE}
 co2
 ```
 
-
-
 ---
 
 class: top
@@ -196,7 +172,7 @@ class: top
 
 ### From `ts` to `tsibble`
 
-```{r co2-tidy}
+```{r co2-tidy, echo = TRUE}
 as_tsibble(co2)
 ```
 
@@ -214,6 +190,82 @@ class: top
 library(tsibble)
 tourism
 ```
+
+---
+class: top
+
+## Holidays by state
+
+```{r, holiday-agg, echo = TRUE}
+holidays <- tourism %>% 
+  filter(Purpose=="Holiday") %>%
+  group_by(State) %>%
+  summarise(Trips = sum(Trips))
+```
+
+```{r holiday-print, echo=FALSE}
+holidays
+```
+
+
+---
+class: top
+
+## Time plots
+
+```{r, echo = TRUE, fig.height = 5, echo = TRUE}
+holidays %>% autoplot(Trips)
+```
+
+---
+class: top
+
+## Season plots
+
+```{r graphics1, fig.width=5, fig.height=8, echo = TRUE, out.width = "350px"}
+holidays %>% gg_season(Trips)
+```
+
+---
+class: top
+
+## Graphics
+
+```{r graphics2, fig.height = 6, echo = TRUE}
+holidays %>% gg_subseries(Trips)
+```
+
+---
+class: top
+
+## Graphics
+
+```{r graphics4, fig.width=5, fig.height=8, echo = TRUE, out.width = "350px"}
+holidays %>% ACF(difference(Trips, 4)) %>% autoplot()
+```
+
+---
+class: top
+
+## Decompositions
+
+The feasts package supports four common time series decomposition methods:
+
+* Classical decomposition
+* STL decomposition
+* X11 decomposition
+* X-13ARIMA-SEATS decomposition
+
+---
+class: top
+
+## Decompositions
+
+```{r dcmp-plot, fig.height=5.6, echo = TRUE}
+holidays %>% STL(Trips ~ season(window = "periodic")) %>%
+  autoplot() + theme(legend.position = "right")
+```
+
 
 ---
 
@@ -379,6 +431,29 @@ holiday_aus %>%
 ```
 ]
 
+---
+
+## Formula model specification
+
+To simplify model building, we use a model formula.
+This should be more familiar to those who have done regression modelling.
+
+```{r model-spec, eval = FALSE, echo = TRUE}
+t(y) ~ {model specification}
+```
+
+.pull-left[
+### LHS: Response
+* Defines the response variable from the data
+* Specification of transformations
+  (which are automatically back-transformed)
+]
+
+.pull-right[
+### RHS: Specials
+* Model specific special functions
+* Exogenous regressors (if supported by model)
+]
 
 ---
 
@@ -999,14 +1074,6 @@ Rob Hyndman
 Earo Wang
 ]
 
---
-
-### Join our group.
-
-Monash University is now hiring in business analytics.
-
-See [bit.ly/monash-ba](bit.ly/monash-ba) for details.
-
 ---
 
 class: inverse, top
@@ -1022,7 +1089,7 @@ class: inverse, top
 
 `r fa("chart-line", fill = "white")` Keep updated: [tidyverts.org](http://www.tidyverts.org)
 
-`r fa("desktop", fill = "white")` Review slides: [slides.mitchelloharawild.com/isf2019](https://slides.mitchelloharawild.com/isf2019)
+`r fa("desktop", fill = "white")` Review slides: [slides.mitchelloharawild.com/amazon-berlin2019](https://slides.mitchelloharawild.com/amazon-berlin2019)
 
 <br>
 
