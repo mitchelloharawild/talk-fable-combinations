@@ -29,7 +29,7 @@ library(lubridate)
 library(htmltools)
 
 library(tsibble)
-library(fasster)
+library(feasts)
 library(fable)
 
 opts_chunk$set(
@@ -138,13 +138,33 @@ class: center
 
 ## Why change?
 
- * Integrating with tidyverse packages
+ * Seamless integration with tidyverse packages
+ * Suitable for sub-daily data with multiple seasonal periods
+ * Support for irregular and multivariate relationships
  * Designed for forecasting many related time series
- * Consistency of interface using formulas
- * Distribution forecasting rather than point + interval
- * Flexible transformations
- * Sub-daily data and multiple seasonal data handled more easily
- * Simpler interface for forecast reconciliation
+ * Consistent and intuitive modelling interface
+ * Distribution forecasting
+
+
+---
+
+class: inverse, top
+
+.sticker-float[![tsibble](resources/tsibble.svg)]
+
+.title[tsibble]
+
+* A modern temporal data structure
+* Provides tools for time-related analysis
+* Integrates seamlessly with the tidyverse
+
+<br>
+
+More information:
+
+* `r fa("github", fill = "white")` [tidyverts/tsibble](https://github.com/tidyverts/tsibble)
+* `r fa("globe", fill = "white")` [tsibble site](https://tsibble.tidyverts.org/)
+* `r fa("desktop", fill = "white")` [rstudio::conf 2019](https://slides.earo.me/rstudioconf19/#1) & [useR!2018](http://slides.earo.me/useR18/)
 
 ---
 
@@ -192,60 +212,83 @@ tourism
 ```
 
 ---
+
 class: top
 
-## Holidays by state
+.sticker-float[![dplyr](resources/dplyr.svg)].sticker-float[![tsibble](resources/tsibble.svg)]
+
+# Data manipulation with dplyr
+
+### Holiday tourism by state
 
 ```{r, holiday-agg, echo = TRUE}
-holidays <- tourism %>% 
+holiday_aus <- tourism %>% 
   filter(Purpose=="Holiday") %>%
   group_by(State) %>%
   summarise(Trips = sum(Trips))
 ```
 
 ```{r holiday-print, echo=FALSE}
-holidays
+holiday_aus
 ```
 
+---
+
+class: inverse, top
+
+.sticker-float[![feasts](resources/feasts.svg)]
+
+.title[feasts]
+
+* Graphics for time series
+* Decompositions into structural components
+* Feature extraction (summaries and statistical tests)
+
+<br>
+
+More information:
+
+* `r fa("github", fill = "white")` [tidyverts/feasts](https://github.com/tidyverts/feasts)
+* `r fa("globe", fill = "white")` [feasts site](https://feasts.tidyverts.org/)
+* `r fa("desktop", fill = "white")` [ISF 2019](https://github.com/robjhyndman/feasts-talk)
 
 ---
 class: top
 
-## Time plots
+.sticker-float[![feasts](resources/feasts.svg)]
+
+## Time series plots
 
 ```{r, echo = TRUE, fig.height = 5, echo = TRUE}
-holidays %>% autoplot(Trips)
+holiday_aus %>% autoplot(Trips)
 ```
 
 ---
 class: top
 
-## Season plots
+.sticker-float[![feasts](resources/feasts.svg)]
+
+## Seasonal plots
 
 ```{r graphics1, fig.width=5, fig.height=8, echo = TRUE, out.width = "350px"}
-holidays %>% gg_season(Trips)
+holiday_aus %>% gg_season(Trips)
 ```
 
 ---
 class: top
 
-## Graphics
+.sticker-float[![feasts](resources/feasts.svg)]
+
+## Subseries plots
 
 ```{r graphics2, fig.height = 6, echo = TRUE}
-holidays %>% gg_subseries(Trips)
+holiday_aus %>% gg_subseries(Trips)
 ```
 
 ---
 class: top
 
-## Graphics
-
-```{r graphics4, fig.width=5, fig.height=8, echo = TRUE, out.width = "350px"}
-holidays %>% ACF(difference(Trips, 4)) %>% autoplot()
-```
-
----
-class: top
+.sticker-float[![feasts](resources/feasts.svg)]
 
 ## Decompositions
 
@@ -259,13 +302,14 @@ The feasts package supports four common time series decomposition methods:
 ---
 class: top
 
+.sticker-float[![feasts](resources/feasts.svg)]
+
 ## Decompositions
 
 ```{r dcmp-plot, fig.height=5.6, echo = TRUE}
-holidays %>% STL(Trips ~ season(window = "periodic")) %>%
+holiday_aus %>% STL(Trips ~ season(window = "periodic")) %>%
   autoplot() + theme(legend.position = "right")
 ```
-
 
 ---
 
@@ -273,12 +317,11 @@ class: top
 
 .sticker-float[![feasts](resources/feasts.svg)]
 
-# A peak at the features
+# Feature extraction
 
 ### Compute features relating to STL decompositions
 
 ```{r tourism-features, echo = TRUE}
-library(feasts)
 tourism_features <- tourism %>% 
   features(Trips, feature_set(tags = "stl"))
 ```
@@ -293,7 +336,7 @@ class: top
 
 .sticker-float[![ggplot2](resources/ggplot2.svg)]
 
-# A peak at the features
+# Feature extraction
 
 .full-width[
 ```{r tourism-features-plot, echo = TRUE}
@@ -307,35 +350,23 @@ tourism_features %>%
 
 ---
 
-class: top
+class: inverse, top
 
-.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
+.sticker-float[![fable](resources/fable.svg)]
 
-# Total holidays across Australia
+.title[fable]
 
-### Starting from the top
+* A tidy reimplementation of the `forecast` package
+* Encourages flexible and transparent model design
+* Support for model combinations (ensembling and reconciliation)
 
-```{r tourism-total, echo = TRUE, fig.show='hide'}
-library(dplyr)
-holiday_aus <- tourism %>% 
-  filter(Purpose == "Holiday") %>% 
-  summarise(Trips = sum(Trips))
+<br>
 
-holiday_aus %>% 
-  autoplot(Trips)
-```
+More information:
 
-.flex-row[
-```{r tourism-total-print, echo = FALSE}
-holiday_aus
-```
-.full-width[
-```{r tourism-total-plot, echo = FALSE}
-holiday_aus %>% 
-  autoplot(Trips)
-```
-]
-]
+* `r fa("github", fill = "white")` [tidyverts/fable](https://github.com/tidyverts/fable)
+* `r fa("globe", fill = "white")` [fable site](https://fable.tidyverts.org/)
+* `r fa("desktop", fill = "white")` [ISF2019](https://slides.mitchelloharawild.com/isf2019/) & [useR!2018](https://github.com/robjhyndman/fable-talk-2018/raw/master/fable_useR2018.pdf)
 
 ---
 
@@ -433,6 +464,17 @@ holiday_aus %>%
 
 ---
 
+.full-width[
+```{r tourism-total-ets-plot-2, fig.height=8}
+holiday_aus %>% 
+  model(ETS(Trips)) %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(holiday_aus)
+```
+]
+
+---
+
 ## Formula model specification
 
 To simplify model building, we use a model formula.
@@ -515,6 +557,7 @@ class: top
 
 ```{r, fig.height = 3}
 fit <- holiday_aus %>% 
+  filter(State == "Victoria") %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(ETS(Trips))
 fit %>% 
@@ -525,7 +568,7 @@ fit %>%
   geom_label(aes(x=x, y=y, label=label), 
                  data = tibble(
                    x = yearquarter(c("2006 Q2", "2016 Q3")), 
-                   y = c(13000, 13000), 
+                   y = c(3750, 3750), 
                    label = c("Training", "Test")
                  )
   ) + 
@@ -593,6 +636,13 @@ holiday_aus %>%
 
 ---
 
+.full-width[
+```{r tourism-total-many-plot-output-2, ref.label="tourism-total-many-plot", echo=FALSE, cache=TRUE, fig.height = 7.6}
+```
+]
+
+---
+
 class: top
 
 # Comparing multiple models
@@ -615,6 +665,36 @@ holiday_aus %>%
 ]
 .right-plot[
 ```{r tourism-total-many-fc-acc-output, ref.label="tourism-total-many-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+
+---
+
+class: top
+
+# Comparing multiple models
+
+### Forecast accuracy
+
+.left-code[
+```{r tourism-total-many-fc-acc-med, eval=FALSE, echo=TRUE}
+holiday_aus %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  forecast(h = "3 years") %>%
+  accuracy(holiday_aus) %>%
+  group_by(.model) %>% #<<
+  summarise_at(vars(ME:ACF1), median) %>% #<<
+  arrange(MASE)
+```
+]
+.right-plot[
+```{r tourism-total-many-fc-acc-med-output, ref.label="tourism-total-many-fc-acc-med", echo=FALSE, cache=TRUE, fig.height = 6}
 ```
 ]
 
@@ -724,6 +804,13 @@ holiday_aus %>%
 
 ---
 
+.full-width[
+```{r tourism-total-combn-plot-output-2, ref.label="tourism-total-combn-plot", echo=FALSE, cache=TRUE, fig.height = 7.6}
+```
+]
+
+---
+
 class: top
 
 # Model ensembling
@@ -742,6 +829,8 @@ holiday_aus %>%
   mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   forecast(h = "3 years") %>% 
   accuracy(holiday_aus) %>% #<<
+  group_by(.model) %>% #<<
+  summarise_at(vars(ME:ACF1), median) %>% #<<
   arrange(MASE) #<<
 ```
 ]
@@ -752,7 +841,7 @@ holiday_aus %>%
 
 ---
 
-# Inconclusive for just one series
+# Inconclusive for just a few series
 
 --
 
@@ -835,21 +924,9 @@ tourism_fc %>%
 ```{r tourism-agg-fc-acc-direct, echo = TRUE, cache = TRUE}
 tourism_fc %>% 
   accuracy(tourism_aggregated) %>% #<<
-  arrange(MASE) #<<
-```
-
----
-
-# Are the combinations better?
-
-### Forecast accuracy
-
-```{r tourism-agg-fc-acc, echo = TRUE, cache = TRUE}
-tourism_fc %>% 
-  accuracy(tourism_aggregated) %>% 
   group_by(.model) %>% #<<
   summarise_at(vars(ME:ACF1), median) %>% #<<
-  arrange(MASE)
+  arrange(MASE) #<<
 ```
 
 ---
@@ -1122,9 +1199,7 @@ class: inverse, top
 <br>
 
 .larger[
-`r fa("globe", fill = "white")` Learn more: [fable.tidyverts.org](https://fable.tidyverts.org/)
-
-`r fa("chart-line", fill = "white")` Keep updated: [tidyverts.org](http://www.tidyverts.org)
+`r fa("chart-line", fill = "white")` Keep updated: [www.tidyverts.org](http://www.tidyverts.org)
 
 `r fa("desktop", fill = "white")` Review slides:  [slides.mitchelloharawild.com/fable-booking2019](https://slides.mitchelloharawild.com/fable-booking2019)
 <br>
