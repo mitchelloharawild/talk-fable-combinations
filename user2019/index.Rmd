@@ -268,33 +268,126 @@ More information:
 
 class: top
 
-.sticker-float[![feasts](resources/feasts.svg)]
+.sticker-float[![tsibble](resources/feasts.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
 
-# A peak at the features
+# Exploring tourism in Australia
 
-### Compute features relating to STL decompositions
+### Time series graphics: season plots
 
-```{r tourism-features, echo = TRUE}
+.pull-left[
+```{r tourism-purpose-seasonplot, echo = TRUE, eval = FALSE}
 library(feasts)
-tourism_features <- tourism %>% 
-  features(Trips, feature_set(tags = "stl"))
+aus_travel %>% 
+  gg_season(Trips)
 ```
 
-```{r tourism-features-print, echo = FALSE}
-tourism_features
+```{r tourism-purpose-seasonplot-output, echo = FALSE, eval = TRUE, fig.height=8}
+library(feasts)
+aus_travel %>% 
+  gg_season(Trips) + 
+  theme(legend.position = "right")
+```
+]
+
+.pull-right[
+<br>
+Highlights seasonal structure by wrapping the x-axis over seasonal periods (years).
+
+- Peak holiday travel in Q1 (summer)
+- Peak business travel in Q2 & Q3
+- Peak visiting travel in Q4 & Q1
+- Other travel is largely non-seasonal
+]
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/feasts.svg)]
+
+# Exploring tourism in Australia
+
+### Time series decomposition: STL
+
+```{r tourism-purpose-stl, echo = TRUE}
+aus_travel_stl <- aus_travel %>% 
+  STL(Trips ~ season(window = "periodic"))
+```
+```{r tourism-purpose-stl-output, echo = FALSE}
+aus_travel_stl
 ```
 
 ---
 
 class: top
 
-.sticker-float[![ggplot2](resources/ggplot2.svg)]
+.sticker-float[![tsibble](resources/feasts.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
 
-# A peak at the features
+# Exploring tourism in Australia
+
+### Time series decomposition: STL
+
+```{r tourism-purpose-stl-plot, echo = TRUE, eval = FALSE}
+aus_travel_stl %>% 
+  autoplot()
+```
+
+```{r tourism-purpose-stl-plot-output, echo = FALSE, fig.height=4.5}
+aus_travel_stl %>% 
+  autoplot() + 
+  theme(legend.position = "right")
+```
+
+---
+
+class: top
+
+.sticker-float[![feasts](resources/feasts.svg)]
+
+# Exploring tourism in Australia
+
+### Representing time series with features
+
+```{r tourism-purpose-features, echo = TRUE}
+aus_travel %>% 
+  features(Trips, feature_set(tags = "stl"))
+```
+
+* All series are trended
+* Holiday travel is most seasonal, "Other" travel is least seasonal
+* Seasonal peaks and troughs switch are Q1 and Q3 (varied by purpose)
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)]
+
+# Exploring tourism in Australia
+
+### Seeing the bigger picture
+
+```{r tourism-recall, echo = TRUE}
+tourism
+```
+
+---
+
+class: top
+
+.sticker-float[![feasts](resources/feasts.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
+
+# Exploring tourism in Australia
+
+### Seeing the bigger picture
+
+```{r tourism-features-plot, echo = TRUE}
+tourism_features <- tourism %>% 
+  features(Trips, feature_set(tags = "stl"))
+```
 
 .full-width[
-```{r tourism-features-plot, echo = TRUE}
-library(ggplot2)
+```{r tourism-features-plot-output, echo = FALSE}
 tourism_features %>% 
   ggplot(aes(x = trend_strength, y = seasonal_strength_year, colour = Purpose)) + 
   geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 5, geom = "polygon") + 
