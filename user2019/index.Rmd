@@ -559,29 +559,50 @@ class: inverse, top
 
 <br>
 
-# Improving forecast accuracy
+# Flexibility with fable
 
 --
 
 <br>
-<br>
 
-## Idea 1: Model ensembling
-
-### Is the combination better than its parts?
+## Combination forecasting
 
 ---
 
 class: top
 
-# Model ensembling
+# Ensemble forecasting
+
+### A simple average of forecasts
+
+--
+
+.left-code[
+```{r tourism-total-many-mdls-recall, eval=FALSE, echo=TRUE}
+aus_travel %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  )
+```
+]
+.right-plot[
+```{r tourism-total-many-mdls-recall-output, ref.label="tourism-total-many-mdls-recall", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+# Ensemble forecasting
 
 ### A simple average of forecasts
 
 .left-code[
 ```{r tourism-total-combn-1, eval=FALSE, echo=TRUE}
 aus_travel %>%
-  filter(Quarter < yearquarter("2015 Q1")) %>%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -601,14 +622,13 @@ aus_travel %>%
 
 class: top
 
-# Model ensembling
+# Ensemble forecasting
 
 ### A simple average of forecasts
 
 .left-code[
 ```{r tourism-total-combn-fc, eval=FALSE, echo=TRUE}
 aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -626,63 +646,89 @@ aus_travel %>%
 ```
 ]
 
+
 ---
 
 class: top
 
-# Model ensembling
+# Ensemble forecasting
 
-### Is it better? Check the forecasts.
+### A simple average of forecasts
+
+.left-code[
+```{r tourism-total-combn-fc-plot, eval=FALSE, echo=TRUE}
+aus_travel %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3
+  ) %>% 
+  select(combn) %>%
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel) #<<
+```
+]
+.right-plot[
+```{r tourism-total-combn-fc-plot-output, ref.label="tourism-total-combn-fc-plot", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
+```
+]
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
 
 --
 
-.left-code[
-```{r tourism-total-combn-plot, eval=FALSE, echo=TRUE}
+```{r tourism-purpose-stl-recall, echo = TRUE}
 aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  forecast(h = "3 years") %>% 
-  autoplot(aus_travel, level = NULL) #<<
+  STL(Trips ~ season(window = "periodic")) #<<
 ```
-]
-.right-plot[
-```{r tourism-total-combn-plot-output, ref.label="tourism-total-combn-plot", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
-
 
 ---
 
 class: top
 
-# Model ensembling
+# Hybrid forecasting
 
-### Is it better? Forecast accuracy
+### Combination of forecasts from decomposed components
 
-.left-code[
-```{r tourism-total-combn-fc-acc, eval=FALSE, echo=TRUE}
+```{r tourism-purpose-stl-plot-recall, echo = TRUE, eval = FALSE}
 aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  STL(Trips ~ season(window = "periodic")) %>% 
+  autoplot() #<<
+```
+
+.full-width[
+```{r tourism-purpose-stl-plot-recall-output, echo = FALSE, fig.height=4.5}
+aus_travel_stl %>% 
+  autoplot() + 
+  xlab(NULL) + 
+  theme(legend.position = "right")
+```
+]
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+```{r tourism-purpose-stl-mdl, echo = TRUE}
+aus_travel %>% 
+  STL(Trips ~ season(window = "periodic")) %>% 
   model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  forecast(h = "3 years") %>% 
-  accuracy(aus_travel) %>% #<<
-  arrange(MASE) #<<
+    hybrid = ETS(trend + remainder) + SNAIVE(season_year)
+  )
 ```
-]
-.right-plot[
-```{r tourism-total-combn-fc-acc-output, ref.label="tourism-total-combn-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
 
 ---
 class: inverse

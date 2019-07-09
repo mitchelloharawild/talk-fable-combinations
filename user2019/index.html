@@ -674,22 +674,54 @@ class: inverse, top
 
 &lt;br&gt;
 
-# Improving forecast accuracy
+# Flexibility with fable
 
 --
 
 &lt;br&gt;
-&lt;br&gt;
 
-## Idea 1: Model ensembling
-
-### Is the combination better than its parts?
+## Combination forecasting
 
 ---
 
 class: top
 
-# Model ensembling
+# Ensemble forecasting
+
+### A simple average of forecasts
+
+--
+
+.left-code[
+
+```r
+aus_travel %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  )
+```
+]
+.right-plot[
+
+```
+#&gt; # A mable: 4 x 4
+#&gt; # Key:     Purpose [4]
+#&gt;   Purpose  ets_n        ets_a        arima                   
+#&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                 
+#&gt; 1 Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;
+#&gt; 2 Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;
+#&gt; 3 Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt;
+#&gt; 4 Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;
+```
+]
+
+---
+
+class: top
+
+# Ensemble forecasting
 
 ### A simple average of forecasts
 
@@ -697,7 +729,6 @@ class: top
 
 ```r
 aus_travel %&gt;%
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -715,8 +746,8 @@ aus_travel %&gt;%
 #&gt; # Key:     Purpose [4]
 #&gt;   Purpose  ets_n        ets_a        arima                    combn        
 #&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                  &lt;model&gt;      
-#&gt; 1 Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,1)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
-#&gt; 2 Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt; &lt;COMBINATION&gt;
+#&gt; 1 Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+#&gt; 2 Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
 #&gt; 3 Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt; &lt;COMBINATION&gt;
 #&gt; 4 Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
 ```
@@ -726,7 +757,7 @@ aus_travel %&gt;%
 
 class: top
 
-# Model ensembling
+# Ensemble forecasting
 
 ### A simple average of forecasts
 
@@ -734,7 +765,6 @@ class: top
 
 ```r
 aus_travel %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -754,98 +784,131 @@ aus_travel %&gt;%
 #&gt; # Key:     Purpose, .model [4]
 #&gt;    Purpose  .model Quarter Trips .distribution  
 #&gt;    &lt;chr&gt;    &lt;chr&gt;    &lt;qtr&gt; &lt;dbl&gt; &lt;dist&gt;         
-#&gt;  1 Business combn  2015 Q1 4136. N(4136,  94319)
-#&gt;  2 Business combn  2015 Q2 4579. N(4579, 148109)
-#&gt;  3 Business combn  2015 Q3 4880. N(4880, 180539)
-#&gt;  4 Business combn  2015 Q4 4656. N(4656, 182474)
-#&gt;  5 Business combn  2016 Q1 3994. N(3994, 177270)
-#&gt;  6 Business combn  2016 Q2 4588. N(4588, 231506)
-#&gt;  7 Business combn  2016 Q3 4872. N(4872, 268254)
-#&gt;  8 Business combn  2016 Q4 4621. N(4621, 264674)
-#&gt;  9 Business combn  2017 Q1 4029. N(4029, 247683)
-#&gt; 10 Business combn  2017 Q2 4626. N(4626, 310665)
+#&gt;  1 Business combn  2018 Q1 5004. N(5004, 122410)
+#&gt;  2 Business combn  2018 Q2 5731. N(5731, 174693)
+#&gt;  3 Business combn  2018 Q3 6036. N(6036, 218982)
+#&gt;  4 Business combn  2018 Q4 5759. N(5759, 244190)
+#&gt;  5 Business combn  2019 Q1 5144. N(5144, 260489)
+#&gt;  6 Business combn  2019 Q2 5871. N(5871, 321799)
+#&gt;  7 Business combn  2019 Q3 6176. N(6176, 375379)
+#&gt;  8 Business combn  2019 Q4 5898. N(5898, 409760)
+#&gt;  9 Business combn  2020 Q1 5284. N(5284, 435676)
+#&gt; 10 Business combn  2020 Q2 6010. N(6010, 507587)
 #&gt; # … with 38 more rows
 ```
 ]
 
+
 ---
 
 class: top
 
-# Model ensembling
+# Ensemble forecasting
 
-### Is it better? Check the forecasts.
+### A simple average of forecasts
+
+.left-code[
+
+```r
+aus_travel %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(
+    combn = (ets_n + ets_a + arima)/3
+  ) %&gt;% 
+  select(combn) %&gt;%
+  forecast(h = "3 years") %&gt;% 
+* autoplot(aus_travel)
+```
+]
+.right-plot[
+&lt;img src="figure/tourism-total-combn-fc-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
 
 --
 
-.left-code[
 
 ```r
 aus_travel %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
-  forecast(h = "3 years") %&gt;% 
-* autoplot(aus_travel, level = NULL)
+* STL(Trips ~ season(window = "periodic"))
 ```
-]
-.right-plot[
-&lt;img src="figure/tourism-total-combn-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
-]
 
+```
+#&gt; # A dable:           320 x 7 [1Q]
+#&gt; # Key:               Purpose [4]
+#&gt; # STL Decomposition: Trips = trend + season_year + remainder
+#&gt;    Purpose  Quarter Trips trend season_year remainder season_adjust
+#&gt;    &lt;chr&gt;      &lt;qtr&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+#&gt;  1 Business 1998 Q1 3599. 3949.      -577.      227.          4175.
+#&gt;  2 Business 1998 Q2 3724. 3910.       109.     -296.          3614.
+#&gt;  3 Business 1998 Q3 4356. 3886.       393.       77.0         3963.
+#&gt;  4 Business 1998 Q4 3796. 3910.        74.0    -188.          3722.
+#&gt;  5 Business 1999 Q1 3335. 4034.      -577.     -123.          3911.
+#&gt;  6 Business 1999 Q2 4714. 4034.       109.      571.          4605.
+#&gt;  7 Business 1999 Q3 4190. 4006.       393.     -210.          3797.
+#&gt;  8 Business 1999 Q4 3701. 3928.        74.0    -301.          3627.
+#&gt;  9 Business 2000 Q1 3562. 3889.      -577.      250.          4139.
+#&gt; 10 Business 2000 Q2 4018. 3981.       109.      -73.1         3908.
+#&gt; # … with 310 more rows
+```
 
 ---
 
 class: top
 
-# Model ensembling
+# Hybrid forecasting
 
-### Is it better? Forecast accuracy
+### Combination of forecasts from decomposed components
 
-.left-code[
 
 ```r
 aus_travel %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %&gt;% 
-  forecast(h = "3 years") %&gt;% 
-* accuracy(aus_travel) %&gt;%
-* arrange(MASE)
+  STL(Trips ~ season(window = "periodic")) %&gt;% 
+* autoplot()
 ```
+
+.full-width[
+&lt;img src="figure/tourism-purpose-stl-plot-recall-output-1.svg" style="display: block; margin: auto;" /&gt;
 ]
-.right-plot[
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+
+```r
+aus_travel %&gt;% 
+  STL(Trips ~ season(window = "periodic")) %&gt;% 
+  model(
+    hybrid = ETS(trend + remainder) + SNAIVE(season_year)
+  )
+```
 
 ```
-#&gt; # A tibble: 16 x 10
-#&gt;    .model Purpose  .type      ME   RMSE    MAE    MPE  MAPE  MASE    ACF1
-#&gt;    &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt;  1 arima  Other    Test   -12.4   112.    76.3 -1.59   5.62 0.646 -0.133 
-#&gt;  2 combn  Other    Test     5.03   99.6   77.1 -0.209  5.59 0.653 -0.294 
-#&gt;  3 ets_a  Other    Test   -43.9   101.    80.7 -3.66   6.03 0.683 -0.567 
-#&gt;  4 ets_n  Other    Test    71.4   129.   102.   4.62   7.10 0.863 -0.0743
-#&gt;  5 arima  Visiting Test   538.    686.   539.   6.18   6.20 1.30   0.281 
-#&gt;  6 combn  Visiting Test   600.    746.   600.   6.91   6.91 1.45   0.333 
-#&gt;  7 ets_a  Holiday  Test   581.    700.   581.   5.36   5.36 1.46   0.304 
-#&gt;  8 ets_a  Visiting Test   612.    758.   612.   7.03   7.03 1.47   0.317 
-#&gt;  9 ets_a  Business Test   423.    573.   448.   7.66   8.27 1.51   0.505 
-#&gt; 10 ets_n  Visiting Test   652.    800.   652.   7.53   7.53 1.57   0.367 
-#&gt; 11 ets_n  Business Test   511.    645.   513.   9.50   9.55 1.73   0.569 
-#&gt; 12 combn  Business Test   585.    714.   611.  10.7   11.4  2.06   0.461 
-#&gt; 13 combn  Holiday  Test   927.   1042.   927.   8.57   8.57 2.33   0.390 
-#&gt; 14 ets_n  Holiday  Test   939.   1061.   939.   8.69   8.69 2.36   0.415 
-#&gt; 15 arima  Business Test   820.    968.   883.  15.1   16.6  2.97   0.233 
-#&gt; 16 arima  Holiday  Test  1261.   1380.  1261.  11.7   11.7  3.16   0.425
+#&gt; # A mable: 4 x 2
+#&gt; # Key:     Purpose [4]
+#&gt;   Purpose  hybrid       
+#&gt;   &lt;chr&gt;    &lt;model&gt;      
+#&gt; 1 Business &lt;COMBINATION&gt;
+#&gt; 2 Holiday  &lt;COMBINATION&gt;
+#&gt; 3 Other    &lt;COMBINATION&gt;
+#&gt; 4 Visiting &lt;COMBINATION&gt;
 ```
-]
 
 ---
 class: inverse
