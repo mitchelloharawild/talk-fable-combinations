@@ -562,8 +562,8 @@
 <polyline points='121.41,112.95 125.39,112.95 ' style='stroke-width: 1.55; stroke: #333333; stroke-linecap: butt;' clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)' />
 <polyline points='121.41,76.57 125.39,76.57 ' style='stroke-width: 1.55; stroke: #333333; stroke-linecap: butt;' clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)' />
 <polyline points='121.41,40.19 125.39,40.19 ' style='stroke-width: 1.55; stroke: #333333; stroke-linecap: butt;' clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)' />
-<g clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)'><text x='405.90' y='227.35' style='font-size: 16.00px; font-family: Arimo;' textLength='103.18px' lengthAdjust='spacingAndGlyphs'>trend_strength</text></g>
-<g clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)'><text transform='translate(85.41,198.34) rotate(-90)' style='font-size: 16.00px; font-family: Arimo;' textLength='170.78px' lengthAdjust='spacingAndGlyphs'>seasonal_strength_year</text></g>
+<g clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)'><text x='405.46' y='227.35' style='font-size: 16.00px; font-family: Arimo;' textLength='104.05px' lengthAdjust='spacingAndGlyphs'>Trend strength</text></g>
+<g clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)'><text transform='translate(85.41,177.44) rotate(-90)' style='font-size: 16.00px; font-family: Arimo;' textLength='128.98px' lengthAdjust='spacingAndGlyphs'>Seasonal strength</text></g>
 <rect x='120.47' y='246.81' width='279.11' height='33.22' style='stroke-width: 1.55; stroke: none;' clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)' />
 <g clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)'><text x='128.44' y='268.92' style='font-size: 16.00px; font-family: Arimo;' textLength='32.91px' lengthAdjust='spacingAndGlyphs'>level</text></g>
 <rect x='168.43' y='254.78' width='17.28' height='17.28' style='stroke-width: 1.55; stroke: #FFFFFF; fill: #F2F2F2;' clip-path='url(#cpMC4wMHw4NjQuMDB8Mjg4LjAwfDAuMDA=)' />

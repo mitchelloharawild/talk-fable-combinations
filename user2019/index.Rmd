@@ -241,7 +241,13 @@ aus_travel %>%
   geom_line()
 ```
 
-```{r tourism-purpose-plot-output, ref.label="tourism-purpose-plot", echo=FALSE, cache=TRUE}
+```{r tourism-purpose-plot-output, echo = FALSE, fig.height = 3.3}
+library(ggplot2)
+aus_travel %>% 
+  ggplot(aes(x = Quarter, y = Trips, colour = Purpose)) + 
+  geom_line() + 
+  xlab(NULL) + 
+  theme(legend.position = "right")
 ```
 
 ---
@@ -281,7 +287,7 @@ aus_travel %>%
   gg_season(Trips)
 ```
 
-```{r tourism-purpose-seasonplot-output, echo = FALSE, eval = TRUE, fig.height=8}
+```{r tourism-purpose-seasonplot-output, echo = FALSE, eval = TRUE, fig.height=4.8, fig.width=7}
 library(feasts)
 aus_travel %>% 
   gg_season(Trips) + 
@@ -335,6 +341,7 @@ aus_travel_stl %>%
 ```{r tourism-purpose-stl-plot-output, echo = FALSE, fig.height=4.5}
 aus_travel_stl %>% 
   autoplot() + 
+  xlab(NULL) + 
   theme(legend.position = "right")
 ```
 
@@ -390,8 +397,12 @@ tourism_features <- tourism %>%
 ```{r tourism-features-plot-output, echo = FALSE}
 tourism_features %>% 
   ggplot(aes(x = trend_strength, y = seasonal_strength_year, colour = Purpose)) + 
-  geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 5, geom = "polygon") + 
-  facet_wrap(vars(Purpose), nrow = 1) + coord_equal() + xlim(c(0,1)) + ylim(c(0,1))
+  geom_point() + 
+  stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 5, geom = "polygon") + 
+  facet_wrap(vars(Purpose), nrow = 1) +
+  coord_equal() + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  labs(x = "Trend strength", y = "Seasonal strength")
 ```
 ]
 
