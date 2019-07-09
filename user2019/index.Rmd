@@ -202,6 +202,48 @@ library(tsibble)
 tourism
 ```
 
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
+
+# Exploring tourism in Australia
+
+### How does travel vary by purpose?
+
+```{r tourism-purpose, echo = TRUE, fig.show='hide'}
+library(dplyr)
+aus_travel <- tourism %>% 
+  group_by(Purpose) %>% 
+  summarise(Trips = sum(Trips))
+```
+
+```{r tourism-purpose-print, echo = FALSE}
+aus_travel
+```
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
+
+# Exploring tourism in Australia
+
+### How does travel vary by purpose?
+
+```{r tourism-purpose-plot, echo = TRUE, eval = FALSE}
+library(ggplot2)
+aus_travel %>% 
+  ggplot(aes(x = Quarter, y = Trips, colour = Purpose)) + 
+  geom_line()
+```
+
+```{r tourism-purpose-plot-output, ref.label="tourism-purpose-plot", echo=FALSE, cache=TRUE}
+```
+
 ---
 
 class: inverse, top
@@ -258,38 +300,6 @@ tourism_features %>%
   geom_point() + stat_density_2d(aes(fill = Purpose, alpha = ..level..), bins = 5, geom = "polygon") + 
   facet_wrap(vars(Purpose), nrow = 1) + coord_equal() + xlim(c(0,1)) + ylim(c(0,1))
 ```
-]
-
----
-
-class: top
-
-.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
-
-# Total holidays across Australia
-
-### Starting from the top
-
-```{r tourism-total, echo = TRUE, fig.show='hide'}
-library(dplyr)
-holiday_aus <- tourism %>% 
-  filter(Purpose == "Holiday") %>% 
-  summarise(Trips = sum(Trips))
-
-holiday_aus %>% 
-  autoplot(Trips)
-```
-
-.flex-row[
-```{r tourism-total-print, echo = FALSE}
-holiday_aus
-```
-.full-width[
-```{r tourism-total-plot, echo = FALSE}
-holiday_aus %>% 
-  autoplot(Trips)
-```
-]
 ]
 
 ---

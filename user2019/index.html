@@ -222,6 +222,64 @@ tourism
 #&gt; # … with 24,310 more rows
 ```
 
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
+
+# Exploring tourism in Australia
+
+### How does travel vary by purpose?
+
+
+```r
+library(dplyr)
+aus_travel &lt;- tourism %&gt;% 
+  group_by(Purpose) %&gt;% 
+  summarise(Trips = sum(Trips))
+```
+
+
+```
+#&gt; # A tsibble: 320 x 3 [1Q]
+#&gt; # Key:       Purpose [4]
+#&gt;    Purpose  Quarter Trips
+#&gt;    &lt;chr&gt;      &lt;qtr&gt; &lt;dbl&gt;
+#&gt;  1 Business 1998 Q1 3599.
+#&gt;  2 Business 1998 Q2 3724.
+#&gt;  3 Business 1998 Q3 4356.
+#&gt;  4 Business 1998 Q4 3796.
+#&gt;  5 Business 1999 Q1 3335.
+#&gt;  6 Business 1999 Q2 4714.
+#&gt;  7 Business 1999 Q3 4190.
+#&gt;  8 Business 1999 Q4 3701.
+#&gt;  9 Business 2000 Q1 3562.
+#&gt; 10 Business 2000 Q2 4018.
+#&gt; # … with 310 more rows
+```
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
+
+# Exploring tourism in Australia
+
+### How does travel vary by purpose?
+
+
+```r
+library(ggplot2)
+aus_travel %&gt;% 
+  ggplot(aes(x = Quarter, y = Trips, colour = Purpose)) + 
+  geom_line()
+```
+
+&lt;img src="figure/tourism-purpose-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
+
 ---
 
 class: inverse, top
@@ -296,50 +354,6 @@ tourism_features %&gt;%
 ```
 
 &lt;img src="figure/tourism-features-plot-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-class: top
-
-.sticker-float[![tsibble](resources/tsibble.svg)].sticker-float[![dplyr](resources/dplyr.svg)]
-
-# Total holidays across Australia
-
-### Starting from the top
-
-
-```r
-library(dplyr)
-holiday_aus &lt;- tourism %&gt;% 
-  filter(Purpose == "Holiday") %&gt;% 
-  summarise(Trips = sum(Trips))
-
-holiday_aus %&gt;% 
-  autoplot(Trips)
-```
-
-.flex-row[
-
-```
-#&gt; # A tsibble: 80 x 2 [1Q]
-#&gt;    Quarter  Trips
-#&gt;      &lt;qtr&gt;  &lt;dbl&gt;
-#&gt;  1 1998 Q1 11806.
-#&gt;  2 1998 Q2  9276.
-#&gt;  3 1998 Q3  8642.
-#&gt;  4 1998 Q4  9300.
-#&gt;  5 1999 Q1 11172.
-#&gt;  6 1999 Q2  9608.
-#&gt;  7 1999 Q3  8914.
-#&gt;  8 1999 Q4  9026.
-#&gt;  9 2000 Q1 11071.
-#&gt; 10 2000 Q2  9196.
-#&gt; # … with 70 more rows
-```
-.full-width[
-&lt;img src="figure/tourism-total-plot-1.svg" style="display: block; margin: auto;" /&gt;
-]
 ]
 
 ---
