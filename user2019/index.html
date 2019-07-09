@@ -491,13 +491,9 @@ More information:
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecasting with fable
 
 ### Look at the data
-
-&lt;br&gt;
 
 .left-code[
 
@@ -530,13 +526,9 @@ class: top
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecasting with fable
 
 ### Specify and estimate a model
-
-&lt;br&gt;
 
 .left-code[
 
@@ -563,13 +555,9 @@ aus_travel %&gt;%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecasting with fable
 
 ### Make some forecasts
-
-&lt;br&gt;
 
 .left-code[
 
@@ -604,13 +592,9 @@ aus_travel %&gt;%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
-
 # Forecasting with fable
 
-### See the results!
-
-&lt;br&gt;
+### Visualise the results!
 
 .left-code[
 
@@ -627,42 +611,9 @@ aus_travel %&gt;%
 
 
 ---
-
-class: top, inverse
-
-.sticker-float[![fable](resources/fable.svg)]
-
-&lt;br&gt;
-
-## It's easy to make forecasts...
-
-&lt;br&gt;
-
---
-
-# But are they good forecasts?
-
----
 class: top
 
-# Forecast accuracy evaluation
-
-&lt;img src="figure/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
-
---
-
-### MASE: Mean absolute scaled error
-
-`$$\text{MASE} = \dfrac{1}{h}\sum_{t = T+1}^{T+h}\left|\frac{\displaystyle e_{t}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$`
-
-???
-
-The scale is the mean absolute error (MAE) of the seasonal naive model. Essentially, MASE is an accuracy measure relative to the seasonal naive model.
-
----
-class: top
-
-# Comparing multiple models
+# Forecasting with fable
 
 ### Estimate multiple models
 
@@ -670,7 +621,6 @@ class: top
 
 ```r
 aus_travel %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
 *   ets_n = ETS(Trips ~ trend("N")),
 *   ets_a = ETS(Trips ~ trend("A")),
@@ -685,8 +635,8 @@ aus_travel %&gt;%
 #&gt; # Key:     Purpose [4]
 #&gt;   Purpose  ets_n        ets_a        arima                   
 #&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                 
-#&gt; 1 Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,1)(2,1,0)[4]&gt;
-#&gt; 2 Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt;
+#&gt; 1 Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;
+#&gt; 2 Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;
 #&gt; 3 Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt;
 #&gt; 4 Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;
 ```
@@ -696,7 +646,7 @@ aus_travel %&gt;%
 
 class: top
 
-# Comparing multiple models
+# Forecasting with fable
 
 ### Forecasts from multiple models
 
@@ -704,7 +654,6 @@ class: top
 
 ```r
 aus_travel %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -716,50 +665,6 @@ aus_travel %&gt;%
 ]
 .right-plot[
 &lt;img src="figure/tourism-total-many-plot-output-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-class: top
-
-# Comparing multiple models
-
-### Forecast accuracy
-
-.left-code[
-
-```r
-aus_travel %&gt;% 
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  forecast(h = "3 years") %&gt;%
-* accuracy(aus_travel) %&gt;%
-* arrange(MASE)
-```
-]
-.right-plot[
-
-```
-#&gt; # A tibble: 12 x 10
-#&gt;    .model Purpose  .type     ME  RMSE    MAE   MPE  MAPE  MASE    ACF1
-#&gt;    &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt;  1 arima  Other    Test   -12.4  112.   76.3 -1.59  5.62 0.646 -0.133 
-#&gt;  2 ets_a  Other    Test   -43.9  101.   80.7 -3.66  6.03 0.683 -0.567 
-#&gt;  3 ets_n  Other    Test    71.4  129.  102.   4.62  7.10 0.863 -0.0743
-#&gt;  4 arima  Visiting Test   538.   686.  539.   6.18  6.20 1.30   0.281 
-#&gt;  5 ets_a  Holiday  Test   581.   700.  581.   5.36  5.36 1.46   0.304 
-#&gt;  6 ets_a  Visiting Test   612.   758.  612.   7.03  7.03 1.47   0.317 
-#&gt;  7 ets_a  Business Test   423.   573.  448.   7.66  8.27 1.51   0.505 
-#&gt;  8 ets_n  Visiting Test   652.   800.  652.   7.53  7.53 1.57   0.367 
-#&gt;  9 ets_n  Business Test   511.   645.  513.   9.50  9.55 1.73   0.569 
-#&gt; 10 ets_n  Holiday  Test   939.  1061.  939.   8.69  8.69 2.36   0.415 
-#&gt; 11 arima  Business Test   820.   968.  883.  15.1  16.6  2.97   0.233 
-#&gt; 12 arima  Holiday  Test  1261.  1380. 1261.  11.7  11.7  3.16   0.425
-```
 ]
 
 ---
@@ -941,180 +846,6 @@ aus_travel %&gt;%
 #&gt; 16 arima  Holiday  Test  1261.   1380.  1261.  11.7   11.7  3.16   0.425
 ```
 ]
-
----
-
-# Inconclusive for just one series
-
---
-
-### Consider all series in the data...
-
-
-```r
-tourism
-```
-
-```
-#&gt; # A tsibble: 24,320 x 5 [1Q]
-#&gt; # Key:       Region, State, Purpose [304]
-#&gt;    Quarter Region   State           Purpose  Trips
-#&gt;      &lt;qtr&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;chr&gt;    &lt;dbl&gt;
-#&gt;  1 1998 Q1 Adelaide South Australia Business  135.
-#&gt;  2 1998 Q2 Adelaide South Australia Business  110.
-#&gt;  3 1998 Q3 Adelaide South Australia Business  166.
-#&gt;  4 1998 Q4 Adelaide South Australia Business  127.
-#&gt;  5 1999 Q1 Adelaide South Australia Business  137.
-#&gt;  6 1999 Q2 Adelaide South Australia Business  200.
-#&gt;  7 1999 Q3 Adelaide South Australia Business  169.
-#&gt;  8 1999 Q4 Adelaide South Australia Business  134.
-#&gt;  9 2000 Q1 Adelaide South Australia Business  154.
-#&gt; 10 2000 Q2 Adelaide South Australia Business  169.
-#&gt; # … with 24,310 more rows
-```
-
----
-
-# But wait, there's more! Aggregations over keys.
-
-<div id="htmlwidget-cc8cf9fc9228a7dd4f98" style="width:100%;height:550px;" class="collapsibleTree html-widget"></div>
-<script type="application/json" data-for="htmlwidget-cc8cf9fc9228a7dd4f98">{"x":{"data":{"name":"Total Tourism","children":[{"name":"Business","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Holiday","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Other","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Visiting","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]}]},"options":{"hierarchy":["Purpose","State","Region"],"input":null,"attribute":"leafCount","linkLength":null,"fontSize":14,"tooltip":false,"collapsed":true,"zoomable":false,"margin":{"top":20,"bottom":20,"left":116,"right":242},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
-
----
-
-# Consider _all_ series in the data...
-
-
-```r
-tourism_aggregated &lt;- tourism %&gt;% 
-* aggregate_key((State / Region) * Purpose, Trips = sum(Trips))
-```
-
-
-```
-#&gt; # A tsibble: 34,000 x 5 [1Q]
-#&gt; # Key:       State, Region, Purpose [425]
-#&gt;    State   Region  Purpose Quarter  Trips
-#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;qtr&gt;  &lt;dbl&gt;
-#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q1 23182.
-#&gt;  2 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q2 20323.
-#&gt;  3 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q3 19827.
-#&gt;  4 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q4 20830.
-#&gt;  5 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q1 22087.
-#&gt;  6 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q2 21458.
-#&gt;  7 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q3 19914.
-#&gt;  8 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q4 20028.
-#&gt;  9 &lt;total&gt; &lt;total&gt; &lt;total&gt; 2000 Q1 22339.
-#&gt; 10 &lt;total&gt; &lt;total&gt; &lt;total&gt; 2000 Q2 19941.
-#&gt; # … with 33,990 more rows
-```
-
----
-
-# Modelling may take a while...
-
---
-
-### Fortunately, this is embarrassingly parallel!
-
-
-```r
-*library(future)
-*plan(multiprocess)
-tourism_fit &lt;- tourism_aggregated %&gt;%
-  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %&gt;% 
-  mutate(combn = (ets_n + ets_a + arima)/3)
-```
-
-```
-#&gt; # A mable: 425 x 7
-#&gt; # Key:     State, Region, Purpose [425]
-#&gt;    State   Region  Purpose  ets_n        ets_a        arima                            combn        
-#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                          &lt;model&gt;      
-#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(1,0,1)(1,1,0)[4]&gt;         &lt;COMBINATION&gt;
-#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt;
-#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt;         &lt;COMBINATION&gt;
-#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt;         &lt;COMBINATION&gt;
-#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt;
-#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
-#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt;
-#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt;
-#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
-#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(A,N,N)&gt; &lt;ETS(A,A,N)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
-#&gt; # … with 415 more rows
-```
-
----
-
-## Producing forecasts are no different
-
-
-```r
-tourism_fc &lt;- tourism_fit %&gt;% forecast(h = "3 years")
-```
-.full-width[
-&lt;img src="figure/fc-agg-fc-plot-out-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-# Are the combinations better?
-
-### Forecast accuracy
-
-
-```r
-tourism_fc %&gt;% 
-* accuracy(tourism_aggregated) %&gt;%
-* arrange(MASE)
-```
-
-```
-#&gt; # A tibble: 1,700 x 12
-#&gt;    .model State              Region          Purpose  .type      ME   RMSE    MAE      MPE   MAPE  MASE    ACF1
-#&gt;    &lt;chr&gt;  &lt;chr&gt;              &lt;chr&gt;           &lt;chr&gt;    &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt;  1 ets_a  South Australia    Kangaroo Island Other    Test   0.0294  0.253  0.114 -Inf     Inf    0.172 -0.0738
-#&gt;  2 ets_n  South Australia    Eyre Peninsula  Holiday  Test   0.513   4.59   3.70     0.169  10.5  0.328  0.117 
-#&gt;  3 ets_a  Victoria           Peninsula       Business Test   1.55    4.65   3.68     3.63   17.9  0.366 -0.131 
-#&gt;  4 ets_a  New South Wales    Sydney          &lt;total&gt;  Test  -4.38   71.1   64.6     -0.344   2.83 0.410 -0.189 
-#&gt;  5 ets_n  Victoria           High Country    Other    Test   0.909   4.34   3.03    -8.61   34.4  0.421 -0.353 
-#&gt;  6 arima  Victoria           High Country    Other    Test   0.912   4.37   3.06    -8.70   34.7  0.425 -0.352 
-#&gt;  7 combn  South Australia    Eyre Peninsula  Holiday  Test   2.13    5.64   4.81     3.41   12.8  0.427  0.0170
-#&gt;  8 ets_a  Victoria           Upper Yarra     Other    Test   0.854   2.50   1.41  -Inf     Inf    0.430 -0.238 
-#&gt;  9 ets_a  Northern Territory MacDonnell      Other    Test   0.316   0.816  0.318  NaN     Inf    0.436 -0.160 
-#&gt; 10 ets_n  Queensland         Mackay          Holiday  Test  -0.469  12.7    9.43   -12.6    25.8  0.444 -0.536 
-#&gt; # … with 1,690 more rows
-```
-
----
-
-# Are the combinations better?
-
-### Forecast accuracy
-
-
-```r
-tourism_fc %&gt;% 
-  accuracy(tourism_aggregated) %&gt;% 
-* group_by(.model) %&gt;%
-* summarise_at(vars(ME:ACF1), median) %&gt;%
-  arrange(MASE)
-```
-
-```
-#&gt; # A tibble: 4 x 8
-#&gt;   .model    ME  RMSE   MAE   MPE  MAPE  MASE    ACF1
-#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 ets_n   8.73  18.9  15.1  7.23  25.0 0.982 -0.0852
-#&gt; 2 combn   8.77  19.4  15.5  7.39  24.1 0.995 -0.0848
-#&gt; 3 ets_a   7.65  20.2  15.8 NA     26.0 1.03  -0.0733
-#&gt; 4 arima   9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
-```
 
 ---
 class: inverse
@@ -1348,6 +1079,82 @@ class: inverse, top
 .bottom[This work is licensed as &lt;svg style="height:0.8em;top:.04em;position:relative;fill:white;" viewBox="0 0 496 512"&gt;&lt;path d="M254.8 214.8l-33.2 17.3c-9.4-19.6-25.2-19.9-27.5-19.9-22.1 0-33.2 14.6-33.2 43.8 0 23.6 9.2 43.8 33.2 43.8 14.5 0 24.7-7.1 30.6-21.3l30.6 15.5c-6.2 11.5-25.7 39-65.1 39-22.6 0-74-10.3-74-77.1 0-58.7 43-77.1 72.6-77.1 30.8.2 52.7 12.1 66 36zm143.1 0l-32.8 17.3c-9.5-19.8-25.7-19.9-27.9-19.9-22.1 0-33.2 14.6-33.2 43.8 0 23.6 9.2 43.8 33.2 43.8 14.5 0 24.6-7.1 30.5-21.3l31 15.5c-2.1 3.7-21.4 39-65.1 39-22.7 0-74-9.9-74-77.1 0-58.7 43-77.1 72.6-77.1 30.8.2 52.7 12.1 65.7 36zM247.6 8C389.4 8 496 118.1 496 256c0 147.1-118.5 248-248.4 248C113.6 504 0 394.5 0 256 0 123.1 104.7 8 247.6 8zm.8 44.7C130.2 52.7 44.7 150.6 44.7 256c0 109.8 91.2 202.8 203.7 202.8 103.2 0 202.8-81.1 202.8-202.8.1-113.8-90.2-203.3-202.8-203.3z"/&gt;&lt;/svg&gt; BY-NC 4.0.]
 ]
 
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+&lt;br&gt; 
+
+.title[Bonus]
+
+&lt;br&gt;
+&lt;br&gt;
+
+.larger[
+## Accuracy evaluation
+]
+
+---
+class: top
+
+# Forecast accuracy evaluation
+
+&lt;img src="figure/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+### MASE: Mean absolute scaled error
+
+`$$\text{MASE} = \dfrac{1}{h}\sum_{t = T+1}^{T+h}\left|\frac{\displaystyle e_{t}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$`
+
+???
+
+The scale is the mean absolute error (MAE) of the seasonal naive model. Essentially, MASE is an accuracy measure relative to the seasonal naive model.
+
+---
+
+class: top
+
+# Comparing multiple models
+
+### Forecast accuracy
+
+.left-code[
+
+```r
+aus_travel %&gt;% 
+* filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;%
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  forecast(h = "3 years") %&gt;%
+* accuracy(aus_travel) %&gt;%
+* arrange(MASE)
+```
+]
+.right-plot[
+
+```
+#&gt; # A tibble: 12 x 10
+#&gt;    .model Purpose  .type     ME  RMSE    MAE   MPE  MAPE  MASE    ACF1
+#&gt;    &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+#&gt;  1 arima  Other    Test   -12.4  112.   76.3 -1.59  5.62 0.646 -0.133 
+#&gt;  2 ets_a  Other    Test   -43.9  101.   80.7 -3.66  6.03 0.683 -0.567 
+#&gt;  3 ets_n  Other    Test    71.4  129.  102.   4.62  7.10 0.863 -0.0743
+#&gt;  4 arima  Visiting Test   538.   686.  539.   6.18  6.20 1.30   0.281 
+#&gt;  5 ets_a  Holiday  Test   581.   700.  581.   5.36  5.36 1.46   0.304 
+#&gt;  6 ets_a  Visiting Test   612.   758.  612.   7.03  7.03 1.47   0.317 
+#&gt;  7 ets_a  Business Test   423.   573.  448.   7.66  8.27 1.51   0.505 
+#&gt;  8 ets_n  Visiting Test   652.   800.  652.   7.53  7.53 1.57   0.367 
+#&gt;  9 ets_n  Business Test   511.   645.  513.   9.50  9.55 1.73   0.569 
+#&gt; 10 ets_n  Holiday  Test   939.  1061.  939.   8.69  8.69 2.36   0.415 
+#&gt; 11 arima  Business Test   820.   968.  883.  15.1  16.6  2.97   0.233 
+#&gt; 12 arima  Holiday  Test  1261.  1380. 1261.  11.7  11.7  3.16   0.425
+```
+]
 
 ---
 class: inverse, top
@@ -1369,9 +1176,77 @@ class: inverse, top
 
 # Forecast reconciliation
 
-<div id="htmlwidget-dc638aec296b6b43a83b" style="width:100%;height:550px;" class="collapsibleTree html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dc638aec296b6b43a83b">{"x":{"data":{"name":"Total Tourism","children":[{"name":"Business","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Holiday","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Other","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Visiting","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]}]},"options":{"hierarchy":["Purpose","State","Region"],"input":null,"attribute":"leafCount","linkLength":null,"fontSize":14,"tooltip":false,"collapsed":true,"zoomable":false,"margin":{"top":20,"bottom":20,"left":116,"right":242},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-98dc638aec296b6b43a8" style="width:100%;height:550px;" class="collapsibleTree html-widget"></div>
+<script type="application/json" data-for="htmlwidget-98dc638aec296b6b43a8">{"x":{"data":{"name":"Total Tourism","children":[{"name":"Business","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Holiday","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Other","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]},{"name":"Visiting","children":[{"name":"South Australia","children":[{"name":"Adelaide"},{"name":"Adelaide Hills"},{"name":"Barossa"},{"name":"Clare Valley"},{"name":"Eyre Peninsula"},{"name":"Fleurieu Peninsula"},{"name":"Flinders Ranges and Outback"},{"name":"Kangaroo Island"},{"name":"Limestone Coast"},{"name":"Murraylands"},{"name":"Riverland"},{"name":"Yorke Peninsula"}]},{"name":"Northern Territory","children":[{"name":"Alice Springs"},{"name":"Barkly"},{"name":"Darwin"},{"name":"Kakadu Arnhem"},{"name":"Katherine Daly"},{"name":"Lasseter"},{"name":"MacDonnell"}]},{"name":"Western Australia","children":[{"name":"Australia's Coral Coast"},{"name":"Australia's Golden Outback"},{"name":"Australia's North West"},{"name":"Australia's South West"},{"name":"Experience Perth"}]},{"name":"Victoria","children":[{"name":"Ballarat"},{"name":"Bendigo Loddon"},{"name":"Central Highlands"},{"name":"Central Murray"},{"name":"Geelong and the Bellarine"},{"name":"Gippsland"},{"name":"Goulburn"},{"name":"Great Ocean Road"},{"name":"High Country"},{"name":"Lakes"},{"name":"Macedon"},{"name":"Mallee"},{"name":"Melbourne"},{"name":"Melbourne East"},{"name":"Murray East"},{"name":"Peninsula"},{"name":"Phillip Island"},{"name":"Spa Country"},{"name":"Upper Yarra"},{"name":"Western Grampians"},{"name":"Wimmera"}]},{"name":"New South Wales","children":[{"name":"Blue Mountains"},{"name":"Capital Country"},{"name":"Central Coast"},{"name":"Central NSW"},{"name":"Hunter"},{"name":"New England North West"},{"name":"North Coast NSW"},{"name":"Outback NSW"},{"name":"Riverina"},{"name":"Snowy Mountains"},{"name":"South Coast"},{"name":"Sydney"},{"name":"The Murray"}]},{"name":"Queensland","children":[{"name":"Brisbane"},{"name":"Bundaberg"},{"name":"Central Queensland"},{"name":"Darling Downs"},{"name":"Fraser Coast"},{"name":"Gold Coast"},{"name":"Mackay"},{"name":"Northern"},{"name":"Outback"},{"name":"Sunshine Coast"},{"name":"Tropical North Queensland"},{"name":"Whitsundays"}]},{"name":"ACT","children":[{"name":"Canberra"}]},{"name":"Tasmania","children":[{"name":"East Coast"},{"name":"Hobart and the South"},{"name":"Launceston, Tamar and the North"},{"name":"North West"},{"name":"Wilderness West"}]}]}]},"options":{"hierarchy":["Purpose","State","Region"],"input":null,"attribute":"leafCount","linkLength":null,"fontSize":14,"tooltip":false,"collapsed":true,"zoomable":false,"margin":{"top":20,"bottom":20,"left":116,"right":242},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
 
+---
+
+# Consider _all_ series in the data...
+
+
+```r
+tourism_aggregated &lt;- tourism %&gt;% 
+* aggregate_key((State / Region) * Purpose, Trips = sum(Trips))
+```
+
+
+```
+#&gt; # A tsibble: 34,000 x 5 [1Q]
+#&gt; # Key:       State, Region, Purpose [425]
+#&gt;    State   Region  Purpose Quarter  Trips
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;qtr&gt;  &lt;dbl&gt;
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q1 23182.
+#&gt;  2 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q2 20323.
+#&gt;  3 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q3 19827.
+#&gt;  4 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1998 Q4 20830.
+#&gt;  5 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q1 22087.
+#&gt;  6 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q2 21458.
+#&gt;  7 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q3 19914.
+#&gt;  8 &lt;total&gt; &lt;total&gt; &lt;total&gt; 1999 Q4 20028.
+#&gt;  9 &lt;total&gt; &lt;total&gt; &lt;total&gt; 2000 Q1 22339.
+#&gt; 10 &lt;total&gt; &lt;total&gt; &lt;total&gt; 2000 Q2 19941.
+#&gt; # … with 33,990 more rows
+```
+
+---
+
+# Modelling may take a while...
+
+--
+
+### Fortunately, this is embarrassingly parallel!
+
+
+```r
+*library(future)
+*plan(multiprocess)
+tourism_fit &lt;- tourism_aggregated %&gt;%
+  filter(Quarter &lt; yearquarter("2015 Q1")) %&gt;% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %&gt;% 
+  mutate(combn = (ets_n + ets_a + arima)/3)
+```
+
+```
+#&gt; # A mable: 425 x 7
+#&gt; # Key:     State, Region, Purpose [425]
+#&gt;    State   Region  Purpose  ets_n        ets_a        arima                            combn        
+#&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;model&gt;      &lt;model&gt;      &lt;model&gt;                          &lt;model&gt;      
+#&gt;  1 &lt;total&gt; &lt;total&gt; &lt;total&gt;  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(1,0,1)(1,1,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  2 &lt;total&gt; &lt;total&gt; Business &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  3 &lt;total&gt; &lt;total&gt; Holiday  &lt;ETS(M,N,M)&gt; &lt;ETS(M,A,M)&gt; &lt;ARIMA(0,0,0)(0,1,2)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  4 &lt;total&gt; &lt;total&gt; Other    &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,1,1)(1,0,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  5 &lt;total&gt; &lt;total&gt; Visiting &lt;ETS(M,N,M)&gt; &lt;ETS(A,A,A)&gt; &lt;ARIMA(1,0,1)(2,1,0)[4]&gt;         &lt;COMBINATION&gt;
+#&gt;  6 ACT     &lt;total&gt; &lt;total&gt;  &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
+#&gt;  7 ACT     &lt;total&gt; Business &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt;
+#&gt;  8 ACT     &lt;total&gt; Holiday  &lt;ETS(M,N,A)&gt; &lt;ETS(M,A,A)&gt; &lt;ARIMA(0,0,0)(1,0,0)[4] w/ mean&gt; &lt;COMBINATION&gt;
+#&gt;  9 ACT     &lt;total&gt; Other    &lt;ETS(A,N,N)&gt; &lt;ETS(M,A,N)&gt; &lt;ARIMA(0,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
+#&gt; 10 ACT     &lt;total&gt; Visiting &lt;ETS(A,N,N)&gt; &lt;ETS(A,A,N)&gt; &lt;ARIMA(1,0,0) w/ mean&gt;           &lt;COMBINATION&gt;
+#&gt; # … with 415 more rows
+```
 
 ---
 

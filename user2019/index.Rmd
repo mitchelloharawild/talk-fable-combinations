@@ -430,13 +430,9 @@ More information:
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecasting with fable
 
 ### Look at the data
-
-<br>
 
 .left-code[
 ```{r tourism-total-ets-data, eval=FALSE, echo=TRUE}
@@ -452,13 +448,9 @@ aus_travel #<<
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecasting with fable
 
 ### Specify and estimate a model
-
-<br>
 
 .left-code[
 ```{r tourism-total-ets-model, eval=FALSE, echo=TRUE}
@@ -475,13 +467,9 @@ aus_travel %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
-
 # Forecasting with fable
 
 ### Make some forecasts
-
-<br>
 
 .left-code[
 ```{r tourism-total-ets-forecast, eval=FALSE, echo=TRUE}
@@ -499,13 +487,9 @@ aus_travel %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
-
 # Forecasting with fable
 
-### See the results!
-
-<br>
+### Visualise the results!
 
 .left-code[
 ```{r tourism-total-ets-plot, eval=FALSE, echo=TRUE}
@@ -522,66 +506,15 @@ aus_travel %>%
 
 
 ---
-
-class: top, inverse
-
-.sticker-float[![fable](resources/fable.svg)]
-
-<br>
-
-## It's easy to make forecasts...
-
-<br>
-
---
-
-# But are they good forecasts?
-
----
 class: top
 
-# Forecast accuracy evaluation
-
-```{r, fig.height = 3}
-fit <- aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(ETS(Trips))
-fit %>% 
-  forecast(h = "3 years") %>% 
-  autoplot(aus_travel) + 
-  autolayer(augment(fit), .fitted, colour = "blue", linetype = "dashed") + 
-  geom_vline(aes(xintercept = yearquarter("2014 Q4"))) + 
-  geom_label(aes(x=x, y=y, label=label), 
-                 data = tibble(
-                   x = yearquarter(c("2006 Q2", "2016 Q3")), 
-                   y = c(13000, 13000), 
-                   label = c("Training", "Test")
-                 )
-  ) + 
-  theme(legend.position = "right")
-```
-
---
-
-### MASE: Mean absolute scaled error
-
-$$\text{MASE} = \dfrac{1}{h}\sum_{t = T+1}^{T+h}\left|\frac{\displaystyle e_{t}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$
-
-???
-
-The scale is the mean absolute error (MAE) of the seasonal naive model. Essentially, MASE is an accuracy measure relative to the seasonal naive model.
-
----
-class: top
-
-# Comparing multiple models
+# Forecasting with fable
 
 ### Estimate multiple models
 
 .left-code[
 ```{r tourism-total-many-mdls, eval=FALSE, echo=TRUE}
 aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")), #<<
     ets_a = ETS(Trips ~ trend("A")), #<<
@@ -598,14 +531,13 @@ aus_travel %>%
 
 class: top
 
-# Comparing multiple models
+# Forecasting with fable
 
 ### Forecasts from multiple models
 
 .left-code[
 ```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
 aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
     ets_a = ETS(Trips ~ trend("A")),
@@ -616,34 +548,7 @@ aus_travel %>%
 ```
 ]
 .right-plot[
-```{r tourism-total-many-plot-output, ref.label="tourism-total-many-plot", echo=FALSE, cache=TRUE, fig.height = 6}
-```
-]
-
----
-
-class: top
-
-# Comparing multiple models
-
-### Forecast accuracy
-
-.left-code[
-```{r tourism-total-many-fc-acc, eval=FALSE, echo=TRUE}
-aus_travel %>% 
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  forecast(h = "3 years") %>%
-  accuracy(aus_travel) %>%  #<<
-  arrange(MASE) #<<
-```
-]
-.right-plot[
-```{r tourism-total-many-fc-acc-output, ref.label="tourism-total-many-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-total-many-plot-output, ref.label="tourism-total-many-plot", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
 ```
 ]
 
@@ -778,108 +683,6 @@ aus_travel %>%
 ```{r tourism-total-combn-fc-acc-output, ref.label="tourism-total-combn-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
 ```
 ]
-
----
-
-# Inconclusive for just one series
-
---
-
-### Consider all series in the data...
-
-```{r tourism-data-2, echo = TRUE}
-tourism
-```
-
----
-
-# But wait, there's more! Aggregations over keys.
-
-```{r}
-library(collapsibleTree)
-collapsibleTree(key_data(tourism), root = "Total Tourism", 
-                hierarchy = c("Purpose", "State", "Region"),
-                zoomable = FALSE, height = 550, fontSize = 14, width = "100%")
-```
-
----
-
-# Consider _all_ series in the data...
-
-```{r tourism-agg, echo = TRUE}
-tourism_aggregated <- tourism %>% 
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) #<<
-```
-
-```{r tourism-agg-print, echo = FALSE}
-tourism_aggregated
-```
-
----
-
-# Modelling may take a while...
-
---
-
-### Fortunately, this is embarrassingly parallel!
-
-```{r tourism-agg-mdl, echo = TRUE, cache = TRUE}
-library(future) #<<
-plan(multiprocess) #<<
-tourism_fit <- tourism_aggregated %>%
-  filter(Quarter < yearquarter("2015 Q1")) %>% 
-  model(
-    ets_n = ETS(Trips ~ trend("N")),
-    ets_a = ETS(Trips ~ trend("A")),
-    arima = ARIMA(Trips)
-  ) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3)
-```
-```{r tourism-agg-mdl-print, echo = FALSE}
-tourism_fit
-```
-
----
-
-## Producing forecasts are no different
-
-```{r fc-agg-fc-plot, echo = TRUE}
-tourism_fc <- tourism_fit %>% forecast(h = "3 years")
-```
-.full-width[
-```{r fc-agg-fc-plot-out, echo = FALSE, fig.height=6}
-tourism_fc %>% 
-  filter(is_aggregated(State), is_aggregated(Region)) %>% 
-  select(-State, -Region) %>% 
-  autoplot(aggregate_key(tourism, Purpose, Trips = sum(Trips)), level = NULL)
-```
-]
-
----
-
-# Are the combinations better?
-
-### Forecast accuracy
-
-```{r tourism-agg-fc-acc-direct, echo = TRUE, cache = TRUE}
-tourism_fc %>% 
-  accuracy(tourism_aggregated) %>% #<<
-  arrange(MASE) #<<
-```
-
----
-
-# Are the combinations better?
-
-### Forecast accuracy
-
-```{r tourism-agg-fc-acc, echo = TRUE, cache = TRUE}
-tourism_fc %>% 
-  accuracy(tourism_aggregated) %>% 
-  group_by(.model) %>% #<<
-  summarise_at(vars(ME:ACF1), median) %>% #<<
-  arrange(MASE)
-```
 
 ---
 class: inverse
@@ -1105,6 +908,84 @@ class: inverse, top
 .bottom[This work is licensed as `r fa("creative-commons", fill="white")` BY-NC 4.0.]
 ]
 
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+<br> 
+
+.title[Bonus]
+
+<br>
+<br>
+
+.larger[
+## Accuracy evaluation
+]
+
+---
+class: top
+
+# Forecast accuracy evaluation
+
+```{r, fig.height = 3}
+aus_total <- aus_travel %>% 
+  summarise(Trips = sum(Trips))
+fit <- aus_total %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(ETS(Trips))
+fit %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(aus_total) + 
+  autolayer(augment(fit), .fitted, colour = "blue", linetype = "dashed") + 
+  geom_vline(aes(xintercept = yearquarter("2014 Q4"))) + 
+  geom_label(aes(x=x, y=y, label=label), 
+                 data = tibble(
+                   x = yearquarter(c("2006 Q2", "2016 Q3")), 
+                   y = c(13000, 13000), 
+                   label = c("Training", "Test")
+                 )
+  ) + 
+  theme(legend.position = "right")
+```
+
+--
+
+### MASE: Mean absolute scaled error
+
+$$\text{MASE} = \dfrac{1}{h}\sum_{t = T+1}^{T+h}\left|\frac{\displaystyle e_{t}}{\text{scale}}\right|, \hspace{2em}\text{scale} = \displaystyle\frac{1}{T-m}\sum_{t=m+1}^T |y_{t}-y_{t-m}|$$
+
+???
+
+The scale is the mean absolute error (MAE) of the seasonal naive model. Essentially, MASE is an accuracy measure relative to the seasonal naive model.
+
+---
+
+class: top
+
+# Comparing multiple models
+
+### Forecast accuracy
+
+.left-code[
+```{r tourism-total-many-fc-acc, eval=FALSE, echo=TRUE}
+aus_travel %>% 
+  filter(Quarter < yearquarter("2015 Q1")) %>% #<<
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  forecast(h = "3 years") %>%
+  accuracy(aus_travel) %>%  #<<
+  arrange(MASE) #<<
+```
+]
+.right-plot[
+```{r tourism-total-many-fc-acc-output, ref.label="tourism-total-many-fc-acc", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
 
 ---
 class: inverse, top
@@ -1133,6 +1014,42 @@ collapsibleTree(key_data(tourism), root = "Total Tourism",
                 zoomable = FALSE, height = 550, fontSize = 14, width = "100%")
 ```
 
+---
+
+# Consider _all_ series in the data...
+
+```{r tourism-agg, echo = TRUE}
+tourism_aggregated <- tourism %>% 
+  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) #<<
+```
+
+```{r tourism-agg-print, echo = FALSE}
+tourism_aggregated
+```
+
+---
+
+# Modelling may take a while...
+
+--
+
+### Fortunately, this is embarrassingly parallel!
+
+```{r tourism-agg-mdl, echo = TRUE, cache = TRUE}
+library(future) #<<
+plan(multiprocess) #<<
+tourism_fit <- tourism_aggregated %>%
+  filter(Quarter < yearquarter("2015 Q1")) %>% 
+  model(
+    ets_n = ETS(Trips ~ trend("N")),
+    ets_a = ETS(Trips ~ trend("A")),
+    arima = ARIMA(Trips)
+  ) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3)
+```
+```{r tourism-agg-mdl-print, echo = FALSE}
+tourism_fit
+```
 
 ---
 
