@@ -2,7 +2,7 @@
 title: "fable::useR2019"
 subtitle: "Flexible futures for fable functionality"
 author: "Mitchell O'Hara-Wild"
-date: '12/05/2019'
+date: '11/06/2019'
 output:
   xaringan::moon_reader:
     chakra: ./libs/remark-latest.min.js
@@ -96,16 +96,17 @@ theme_set(
 }
 ```
 
-
-.title[fable]
 .sticker-float[![fable](resources/fable.svg)]
 
-## Flexible futures for fable functionality
+.larger[
+# Flexible futures
+## for **fable** functionality
+]
 
 .bottom[
 ### Mitchell O'Hara-Wild (`r fa("twitter", fill="#1da1f2")`[@mitchoharawild](https://twitter.com/mitchoharawild))
 ### Rob Hyndman (`r fa("twitter", fill="#1da1f2")`[@robjhyndman](https://twitter.com/robjhyndman/))
-### 19 June 2019
+### 11 July 2019
 ### Slides @ [slides.mitchelloharawild.com/user2019](https://slides.mitchelloharawild.com/user2019)
 ]
 
@@ -135,6 +136,57 @@ class: center
 ## [tidyverts.org](http://www.tidyverts.org)
 ]
 
+
+---
+
+class: inverse, top
+
+.sticker-float[![tsibble](resources/tsibble.svg)]
+
+.title[tsibble]
+
+* A modern temporal data structure
+* Provides tools for time-related analysis
+* Integrates seamlessly with the tidyverse
+
+<br>
+
+More information:
+
+* `r fa("github", fill = "white")` [tidyverts/tsibble](https://github.com/tidyverts/tsibble)
+* `r fa("globe", fill = "white")` [tsibble site](https://tsibble.tidyverts.org/)
+* `r fa("desktop", fill = "white")` [rstudio::conf 2019](https://slides.earo.me/rstudioconf19/#1) & [useR!2018](http://slides.earo.me/useR18/)
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)]
+
+
+# Tidy temporal data structure
+
+### From `ts` to `tsibble`
+
+```{r co2, echo = TRUE}
+co2
+```
+
+---
+
+class: top
+
+.sticker-float[![tsibble](resources/tsibble.svg)]
+
+
+# Tidy temporal data structure
+
+### From `ts` to `tsibble`
+
+```{r co2-tidy, echo = TRUE}
+as_tsibble(co2)
+```
+
 ---
 
 class: top
@@ -149,6 +201,26 @@ class: top
 library(tsibble)
 tourism
 ```
+
+---
+
+class: inverse, top
+
+.sticker-float[![feasts](resources/feasts.svg)]
+
+.title[feasts]
+
+* Graphics for time series
+* Decompositions into structural components
+* Feature extraction (summaries and statistical tests)
+
+<br>
+
+More information:
+
+* `r fa("github", fill = "white")` [tidyverts/feasts](https://github.com/tidyverts/feasts)
+* `r fa("globe", fill = "white")` [feasts site](https://feasts.tidyverts.org/)
+* `r fa("comments", fill = "white")` Rob Hyndman's talk at 11:48 tomorrow! (Ariane 1+2)
 
 ---
 
@@ -219,6 +291,26 @@ holiday_aus %>%
 ```
 ]
 ]
+
+---
+
+class: inverse, top
+
+.sticker-float[![feasts](resources/fable.svg)]
+
+.title[fable]
+
+* Tidy evolution of the forecast package
+* Models for time series forecasting
+* Tools for analysing and manipulating models
+
+<br>
+
+More information:
+
+* `r fa("github", fill = "white")` [tidyverts/fable](https://github.com/tidyverts/fable)
+* `r fa("globe", fill = "white")` [fable site](https://fable.tidyverts.org/)
+* `r fa("book", fill = "white")` [Forecasting: Principles and Practice (3rd Ed.)](https://otexts.com/fpp3/)
 
 ---
 

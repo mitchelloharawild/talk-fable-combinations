@@ -51,6 +51,13 @@ a, a > code {
   font-size: 36px;
 }
 
+.larger h1 {
+  font-size: 90px;
+}
+.larger h2 {
+  font-size: 80px;
+}
+
 .sticker-float img{
 	height: 200px;
 	float: right;
