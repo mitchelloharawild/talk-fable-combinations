@@ -353,7 +353,7 @@ class: top
 
 # Exploring tourism in Australia
 
-### Representing time series with features
+### Time series features: STL
 
 ```{r tourism-purpose-features, echo = TRUE}
 aus_travel %>% 
@@ -440,7 +440,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-data, eval=FALSE, echo=TRUE}
-holiday_aus #<<
+aus_travel #<<
 ```
 ]
 .right-plot[
@@ -462,7 +462,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-model, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   model(ETS(Trips)) #<<
 ```
 ]
@@ -485,7 +485,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-forecast, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   model(ETS(Trips)) %>% 
   forecast(h = "3 years") #<<
 ```
@@ -499,7 +499,7 @@ holiday_aus %>%
 
 class: top
 
-.sticker-float[![fable](resources/fable.svg)]
+.sticker-float[![fable](resources/fable.svg)].sticker-float[![ggplot2](resources/ggplot2.svg)]
 
 # Forecasting with fable
 
@@ -509,14 +509,14 @@ class: top
 
 .left-code[
 ```{r tourism-total-ets-plot, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   model(ETS(Trips)) %>% 
   forecast(h = "3 years") %>% 
-  autoplot(holiday_aus) #<<
+  autoplot(aus_travel) #<<
 ```
 ]
 .right-plot[
-```{r tourism-total-ets-plot-output, ref.label="tourism-total-ets-plot", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-total-ets-plot-output, ref.label="tourism-total-ets-plot", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
 ```
 ]
 
@@ -543,12 +543,12 @@ class: top
 # Forecast accuracy evaluation
 
 ```{r, fig.height = 3}
-fit <- holiday_aus %>% 
+fit <- aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(ETS(Trips))
 fit %>% 
   forecast(h = "3 years") %>% 
-  autoplot(holiday_aus) + 
+  autoplot(aus_travel) + 
   autolayer(augment(fit), .fitted, colour = "blue", linetype = "dashed") + 
   geom_vline(aes(xintercept = yearquarter("2014 Q4"))) + 
   geom_label(aes(x=x, y=y, label=label), 
@@ -580,7 +580,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-many-mdls, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")), #<<
@@ -604,7 +604,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-many-plot, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -612,7 +612,7 @@ holiday_aus %>%
     arima = ARIMA(Trips)
   ) %>% 
   forecast(h = "3 years") %>% #<<
-  autoplot(holiday_aus, level = NULL) #<<
+  autoplot(aus_travel, level = NULL) #<<
 ```
 ]
 .right-plot[
@@ -630,7 +630,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-many-fc-acc, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -638,7 +638,7 @@ holiday_aus %>%
     arima = ARIMA(Trips)
   ) %>% 
   forecast(h = "3 years") %>%
-  accuracy(holiday_aus) %>%  #<<
+  accuracy(aus_travel) %>%  #<<
   arrange(MASE) #<<
 ```
 ]
@@ -675,7 +675,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-combn-1, eval=FALSE, echo=TRUE}
-holiday_aus %>%
+aus_travel %>%
   filter(Quarter < yearquarter("2015 Q1")) %>%  
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -702,7 +702,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-combn-fc, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -733,7 +733,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-combn-plot, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -742,7 +742,7 @@ holiday_aus %>%
   ) %>% 
   mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   forecast(h = "3 years") %>% 
-  autoplot(holiday_aus, level = NULL) #<<
+  autoplot(aus_travel, level = NULL) #<<
 ```
 ]
 .right-plot[
@@ -761,7 +761,7 @@ class: top
 
 .left-code[
 ```{r tourism-total-combn-fc-acc, eval=FALSE, echo=TRUE}
-holiday_aus %>% 
+aus_travel %>% 
   filter(Quarter < yearquarter("2015 Q1")) %>% 
   model(
     ets_n = ETS(Trips ~ trend("N")),
@@ -770,7 +770,7 @@ holiday_aus %>%
   ) %>% 
   mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   forecast(h = "3 years") %>% 
-  accuracy(holiday_aus) %>% #<<
+  accuracy(aus_travel) %>% #<<
   arrange(MASE) #<<
 ```
 ]
@@ -878,71 +878,6 @@ tourism_fc %>%
   accuracy(tourism_aggregated) %>% 
   group_by(.model) %>% #<<
   summarise_at(vars(ME:ACF1), median) %>% #<<
-  arrange(MASE)
-```
-
----
-class: inverse, top
-
-.sticker-float[![fable](resources/fable.svg)]
-
-<br> 
-
-# Improving forecast accuracy
-
---
-
-<br>
-<br>
-
-## Idea 2: Forecast reconciliation
-
-### Does imposing aggregation structure improve the forecasts?
-
----
-
-# Forecast reconciliation
-
-```{r}
-library(collapsibleTree)
-collapsibleTree(key_data(tourism), root = "Total Tourism", 
-                hierarchy = c("Purpose", "State", "Region"),
-                zoomable = FALSE, height = 550, fontSize = 14, width = "100%")
-```
-
-
----
-
-# Forecast reconciliation
-
-### MinT with covariance shrink
-
-```{r, tourism-agg-mint-fc, echo = TRUE}
-tourism_fc_reconciled <- tourism_fit %>% 
-  reconcile(coherent = min_trace(combn, method = "shrink")) %>% #<<
-  forecast(h = "3 years")
-```
-
-```{r, tourism-agg-mint-fc-out}
-tourism_fc_reconciled
-```
-
-
-.bottom[
-#### (Interface for reconciliation is still experimental.)
-]
-
----
-
-# Forecast reconciliation
-
-### Is it better? Forecast accuracy
-
-```{r, tourism-agg-mint-median-out, echo=TRUE}
-tourism_fc_reconciled %>% 
-  accuracy(tourism_aggregated) %>% 
-  group_by(.model) %>%
-  summarise_at(vars(ME:ACF1), median) %>% 
   arrange(MASE)
 ```
 
@@ -1169,3 +1104,67 @@ class: inverse, top
 
 .bottom[This work is licensed as `r fa("creative-commons", fill="white")` BY-NC 4.0.]
 ]
+
+
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+<br> 
+
+.title[Bonus]
+
+<br>
+<br>
+
+.larger[
+## Forecast reconciliation
+]
+
+---
+
+# Forecast reconciliation
+
+```{r}
+library(collapsibleTree)
+collapsibleTree(key_data(tourism), root = "Total Tourism", 
+                hierarchy = c("Purpose", "State", "Region"),
+                zoomable = FALSE, height = 550, fontSize = 14, width = "100%")
+```
+
+
+---
+
+# Forecast reconciliation
+
+### MinT with covariance shrink
+
+```{r, tourism-agg-mint-fc, echo = TRUE}
+tourism_fc_reconciled <- tourism_fit %>% 
+  reconcile(coherent = min_trace(combn, method = "shrink")) %>% #<<
+  forecast(h = "3 years")
+```
+
+```{r, tourism-agg-mint-fc-out}
+tourism_fc_reconciled
+```
+
+
+.bottom[
+#### (Interface for reconciliation is still experimental.)
+]
+
+---
+
+# Forecast reconciliation
+
+### Is it better? Forecast accuracy
+
+```{r, tourism-agg-mint-median-out, echo=TRUE}
+tourism_fc_reconciled %>% 
+  accuracy(tourism_aggregated) %>% 
+  group_by(.model) %>%
+  summarise_at(vars(ME:ACF1), median) %>% 
+  arrange(MASE)
+```
