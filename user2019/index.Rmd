@@ -105,7 +105,7 @@ theme_set(
 
 .bottom[
 ### Mitchell O'Hara-Wild (`r fa("twitter", fill="#1da1f2")`[@mitchoharawild](https://twitter.com/mitchoharawild))
-### Rob Hyndman (`r fa("twitter", fill="#1da1f2")`[@robjhyndman](https://twitter.com/robjhyndman/))
+<br>
 ### 11 July 2019
 ### Slides @ [slides.mitchelloharawild.com/user2019](https://slides.mitchelloharawild.com/user2019)
 ]
