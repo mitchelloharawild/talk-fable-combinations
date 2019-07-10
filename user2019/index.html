@@ -1441,6 +1441,64 @@ tourism_fc_reconciled %&gt;%
 #&gt; 4 ets_a     7.65  20.2  15.8 NA     26.0 1.03  -0.0733
 #&gt; 5 arima     9.01  20.3  16.5  8.07  26.2 1.07  -0.0849
 ```
+
+
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+&lt;br&gt; 
+
+.title[Bonus]
+
+&lt;br&gt;
+&lt;br&gt;
+
+.larger[
+## Multivariate modelling
+]
+
+---
+
+# Multivariate modelling
+
+
+```r
+lung_deaths &lt;- cbind(mdeaths, fdeaths) %&gt;% 
+  as_tsibble(pivot_longer = FALSE)
+```
+
+```
+#&gt; # A tsibble: 72 x 3 [1M]
+#&gt;       index mdeaths fdeaths
+#&gt;       &lt;mth&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+#&gt;  1 1974 Jan    2134     901
+#&gt;  2 1974 Feb    1863     689
+#&gt;  3 1974 Mar    1877     827
+#&gt;  4 1974 Apr    1877     677
+#&gt;  5 1974 May    1492     522
+#&gt;  6 1974 Jun    1249     406
+#&gt;  7 1974 Jul    1280     441
+#&gt;  8 1974 Aug    1131     393
+#&gt;  9 1974 Sep    1209     387
+#&gt; 10 1974 Oct    1492     582
+#&gt; # … with 62 more rows
+```
+
+---
+
+# Multivariate modelling
+
+
+```r
+lung_deaths %&gt;% 
+* model(VAR(vars(mdeaths, fdeaths) ~ AR(3) + fourier("year", 4))) %&gt;%
+  forecast() %&gt;% 
+  autoplot(lung_deaths)
+```
+
+&lt;img src="figure/mv-var-1.svg" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="./libs/remark-latest.min.js"></script>

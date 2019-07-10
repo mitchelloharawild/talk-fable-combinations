@@ -1214,3 +1214,43 @@ tourism_fc_reconciled %>%
   summarise_at(vars(ME:ACF1), median) %>% 
   arrange(MASE)
 ```
+
+
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+<br> 
+
+.title[Bonus]
+
+<br>
+<br>
+
+.larger[
+## Multivariate modelling
+]
+
+---
+
+# Multivariate modelling
+
+```{r mv-data, echo = TRUE}
+lung_deaths <- cbind(mdeaths, fdeaths) %>% 
+  as_tsibble(pivot_longer = FALSE)
+```
+```{r mv-data-output}
+lung_deaths
+```
+
+---
+
+# Multivariate modelling
+
+```{r mv-var, echo = TRUE}
+lung_deaths %>% 
+  model(VAR(vars(mdeaths, fdeaths) ~ AR(3) + fourier("year", 4))) %>% #<<
+  forecast() %>% 
+  autoplot(lung_deaths)
+```
