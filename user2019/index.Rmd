@@ -686,10 +686,19 @@ class: top
 
 --
 
+.left-code[
 ```{r tourism-purpose-stl-recall, echo = TRUE}
 aus_travel_stl <- aus_travel %>% 
   STL(Trips ~ season(window = "periodic")) #<<
 ```
+]
+
+.right-plot[
+```{r tourism-purpose-stl-recall-output}
+aus_travel_stl
+```
+
+]
 
 ---
 
@@ -699,12 +708,15 @@ class: top
 
 ### Combination of forecasts from decomposed components
 
+.left-code[
 ```{r tourism-purpose-stl-plot-recall, echo = TRUE, eval = FALSE}
 aus_travel_stl %>% 
+  STL(Trips ~ season(window = "periodic")) %>% 
   autoplot() #<<
 ```
+]
 
-.full-width[
+.right-plot[
 ```{r tourism-purpose-stl-plot-recall-output, echo = FALSE, fig.height=4.5}
 aus_travel_stl %>% 
   autoplot() + 
@@ -721,44 +733,70 @@ class: top
 
 ### Combination of forecasts from decomposed components
 
-```{r tourism-purpose-stl-mdl-deseas, echo = TRUE}
-aus_travel_stl %>% 
-  model(deseas = ETS(trend + remainder)) %>% #<<
-  forecast(h = "3 years") %>% 
-  autoplot(aus_travel_stl)
-```
-
----
-
-class: top
-
-# Hybrid forecasting
-
-### Combination of forecasts from decomposed components
-
-```{r tourism-purpose-stl-mdl-seas, echo = TRUE}
-aus_travel_stl %>% 
-  model(seas = SNAIVE(season_year)) %>% #<<
-  forecast(h = "3 years") %>% 
-  autoplot(aus_travel_stl)
-```
-
----
-
-class: top
-
-# Hybrid forecasting
-
-### Combination of forecasts from decomposed components
-
-```{r tourism-purpose-stl-mdl, echo = TRUE}
+.left-code[
+```{r tourism-purpose-stl-mdl-deseas, echo = TRUE, eval = FALSE}
 aus_travel_stl %>% 
   model(
-    hybrid = ETS(trend + remainder) + SNAIVE(season_year)
+    deseas = ETS(trend + remainder) #<<
+  ) %>%
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel_stl)
+```
+]
+
+.right-plot[
+```{r tourism-purpose-stl-mdl-deseas-output, ref.label="tourism-purpose-stl-mdl-deseas", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+.left-code[
+```{r tourism-purpose-stl-mdl-seas, echo = TRUE, eval = FALSE}
+aus_travel_stl %>% 
+  model(
+    deseas = SNAIVE(season_year) #<<
   ) %>% 
   forecast(h = "3 years") %>% 
   autoplot(aus_travel_stl)
 ```
+]
+
+.right-plot[
+```{r tourism-purpose-stl-mdl-seas-output, ref.label="tourism-purpose-stl-mdl-seas", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+.left-code[
+```{r tourism-purpose-stl-mdl, echo = TRUE, eval = FALSE}
+aus_travel_stl %>% 
+  model(
+    hybrid = ETS(trend + remainder) +#<<
+      SNAIVE(season_year) #<<
+  ) %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel_stl)
+```
+]
+
+.right-plot[
+```{r tourism-purpose-stl-mdl-output, ref.label="tourism-purpose-stl-mdl", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
 
 ---
 class: inverse, top
