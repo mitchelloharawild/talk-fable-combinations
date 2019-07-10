@@ -880,8 +880,9 @@ class: top
 .left-code[
 
 ```r
+aus_travel_stl &lt;- aus_travel %&gt;% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %&gt;% 
-  STL(Trips ~ season(window = "periodic")) %&gt;% 
 * autoplot()
 ```
 ]
@@ -901,6 +902,8 @@ class: top
 .left-code[
 
 ```r
+aus_travel_stl &lt;- aus_travel %&gt;% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %&gt;% 
   model(
 *   deseas = ETS(trend + remainder)
@@ -925,6 +928,8 @@ class: top
 .left-code[
 
 ```r
+aus_travel_stl &lt;- aus_travel %&gt;% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %&gt;% 
   model(
 *   deseas = SNAIVE(season_year)
@@ -949,6 +954,8 @@ class: top
 .left-code[
 
 ```r
+aus_travel_stl &lt;- aus_travel %&gt;% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %&gt;% 
   model(
 *   hybrid = ETS(trend + remainder) +
@@ -961,6 +968,35 @@ aus_travel_stl %&gt;%
 
 .right-plot[
 &lt;img src="figure/tourism-purpose-stl-mdl-output-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+.left-code[
+
+```r
+aus_travel %&gt;%
+  model(
+*   hybrid = decomposition_model(
+*     STL, Trips ~ season(window = "periodic"),
+*     ETS(trend + remainder),
+*     SNAIVE(season_year)
+*   )
+  ) %&gt;% 
+  forecast(h = "3 years") %&gt;% 
+  autoplot(aus_travel_stl)
+```
+]
+
+.right-plot[
+&lt;img src="figure/tourism-purpose-stl-mdl-alt-output-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---

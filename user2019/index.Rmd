@@ -710,8 +710,9 @@ class: top
 
 .left-code[
 ```{r tourism-purpose-stl-plot-recall, echo = TRUE, eval = FALSE}
+aus_travel_stl <- aus_travel %>% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %>% 
-  STL(Trips ~ season(window = "periodic")) %>% 
   autoplot() #<<
 ```
 ]
@@ -735,6 +736,8 @@ class: top
 
 .left-code[
 ```{r tourism-purpose-stl-mdl-deseas, echo = TRUE, eval = FALSE}
+aus_travel_stl <- aus_travel %>% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %>% 
   model(
     deseas = ETS(trend + remainder) #<<
@@ -759,6 +762,8 @@ class: top
 
 .left-code[
 ```{r tourism-purpose-stl-mdl-seas, echo = TRUE, eval = FALSE}
+aus_travel_stl <- aus_travel %>% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %>% 
   model(
     deseas = SNAIVE(season_year) #<<
@@ -783,6 +788,8 @@ class: top
 
 .left-code[
 ```{r tourism-purpose-stl-mdl, echo = TRUE, eval = FALSE}
+aus_travel_stl <- aus_travel %>% 
+  STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %>% 
   model(
     hybrid = ETS(trend + remainder) +#<<
@@ -795,6 +802,35 @@ aus_travel_stl %>%
 
 .right-plot[
 ```{r tourism-purpose-stl-mdl-output, ref.label="tourism-purpose-stl-mdl", echo=FALSE, cache=TRUE, fig.height = 6}
+```
+]
+
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+.left-code[
+```{r tourism-purpose-stl-mdl-alt, echo = TRUE, eval = FALSE}
+aus_travel %>%
+  model(
+    hybrid = decomposition_model(#<<
+      STL, Trips ~ season(window = "periodic"),#<<
+      ETS(trend + remainder),#<<
+      SNAIVE(season_year) #<<
+    )#<<
+  ) %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel_stl)
+```
+]
+
+.right-plot[
+```{r tourism-purpose-stl-mdl-alt-output, ref.label="tourism-purpose-stl-mdl-alt", echo=FALSE, cache=TRUE, fig.height = 6}
 ```
 ]
 
