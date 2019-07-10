@@ -44,7 +44,7 @@ class: inverse
 
 .bottom[
 ### Mitchell O'Hara-Wild (&lt;svg style="height:0.8em;top:.04em;position:relative;fill:#1da1f2;" viewBox="0 0 512 512"&gt;&lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/&gt;&lt;/svg&gt;[@mitchoharawild](https://twitter.com/mitchoharawild))
-### Rob Hyndman (&lt;svg style="height:0.8em;top:.04em;position:relative;fill:#1da1f2;" viewBox="0 0 512 512"&gt;&lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/&gt;&lt;/svg&gt;[@robjhyndman](https://twitter.com/robjhyndman/))
+&lt;br&gt;
 ### 11 July 2019
 ### Slides @ [slides.mitchelloharawild.com/user2019](https://slides.mitchelloharawild.com/user2019)
 ]
@@ -840,27 +840,8 @@ class: top
 
 
 ```r
-aus_travel %&gt;% 
+aus_travel_stl &lt;- aus_travel %&gt;% 
 * STL(Trips ~ season(window = "periodic"))
-```
-
-```
-#&gt; # A dable:           320 x 7 [1Q]
-#&gt; # Key:               Purpose [4]
-#&gt; # STL Decomposition: Trips = trend + season_year + remainder
-#&gt;    Purpose  Quarter Trips trend season_year remainder season_adjust
-#&gt;    &lt;chr&gt;      &lt;qtr&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
-#&gt;  1 Business 1998 Q1 3599. 3949.      -577.      227.          4175.
-#&gt;  2 Business 1998 Q2 3724. 3910.       109.     -296.          3614.
-#&gt;  3 Business 1998 Q3 4356. 3886.       393.       77.0         3963.
-#&gt;  4 Business 1998 Q4 3796. 3910.        74.0    -188.          3722.
-#&gt;  5 Business 1999 Q1 3335. 4034.      -577.     -123.          3911.
-#&gt;  6 Business 1999 Q2 4714. 4034.       109.      571.          4605.
-#&gt;  7 Business 1999 Q3 4190. 4006.       393.     -210.          3797.
-#&gt;  8 Business 1999 Q4 3701. 3928.        74.0    -301.          3627.
-#&gt;  9 Business 2000 Q1 3562. 3889.      -577.      250.          4139.
-#&gt; 10 Business 2000 Q2 4018. 3981.       109.      -73.1         3908.
-#&gt; # … with 310 more rows
 ```
 
 ---
@@ -873,8 +854,7 @@ class: top
 
 
 ```r
-aus_travel %&gt;% 
-  STL(Trips ~ season(window = "periodic")) %&gt;% 
+aus_travel_stl %&gt;% 
 * autoplot()
 ```
 
@@ -892,23 +872,51 @@ class: top
 
 
 ```r
-aus_travel %&gt;% 
-  STL(Trips ~ season(window = "periodic")) %&gt;% 
-  model(
-    hybrid = ETS(trend + remainder) + SNAIVE(season_year)
-  )
+aus_travel_stl %&gt;% 
+* model(deseas = ETS(trend + remainder)) %&gt;%
+  forecast(h = "3 years") %&gt;% 
+  autoplot(aus_travel_stl)
 ```
 
+&lt;img src="figure/tourism-purpose-stl-mdl-deseas-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+
+```r
+aus_travel_stl %&gt;% 
+* model(seas = SNAIVE(season_year)) %&gt;%
+  forecast(h = "3 years") %&gt;% 
+  autoplot(aus_travel_stl)
 ```
-#&gt; # A mable: 4 x 2
-#&gt; # Key:     Purpose [4]
-#&gt;   Purpose  hybrid       
-#&gt;   &lt;chr&gt;    &lt;model&gt;      
-#&gt; 1 Business &lt;COMBINATION&gt;
-#&gt; 2 Holiday  &lt;COMBINATION&gt;
-#&gt; 3 Other    &lt;COMBINATION&gt;
-#&gt; 4 Visiting &lt;COMBINATION&gt;
+
+&lt;img src="figure/tourism-purpose-stl-mdl-seas-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+
+```r
+aus_travel_stl %&gt;% 
+  model(
+    hybrid = ETS(trend + remainder) + SNAIVE(season_year)
+  ) %&gt;% 
+  forecast(h = "3 years") %&gt;% 
+  autoplot(aus_travel_stl)
 ```
+
+&lt;img src="figure/tourism-purpose-stl-mdl-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 class: inverse

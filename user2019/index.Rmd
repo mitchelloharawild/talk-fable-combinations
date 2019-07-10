@@ -687,7 +687,7 @@ class: top
 --
 
 ```{r tourism-purpose-stl-recall, echo = TRUE}
-aus_travel %>% 
+aus_travel_stl <- aus_travel %>% 
   STL(Trips ~ season(window = "periodic")) #<<
 ```
 
@@ -700,8 +700,7 @@ class: top
 ### Combination of forecasts from decomposed components
 
 ```{r tourism-purpose-stl-plot-recall, echo = TRUE, eval = FALSE}
-aus_travel %>% 
-  STL(Trips ~ season(window = "periodic")) %>% 
+aus_travel_stl %>% 
   autoplot() #<<
 ```
 
@@ -722,13 +721,59 @@ class: top
 
 ### Combination of forecasts from decomposed components
 
+```{r tourism-purpose-stl-mdl-deseas, echo = TRUE}
+aus_travel_stl %>% 
+  model(deseas = ETS(trend + remainder)) %>% #<<
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel_stl)
+```
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
+```{r tourism-purpose-stl-mdl-seas, echo = TRUE}
+aus_travel_stl %>% 
+  model(seas = SNAIVE(season_year)) %>% #<<
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel_stl)
+```
+
+---
+
+class: top
+
+# Hybrid forecasting
+
+### Combination of forecasts from decomposed components
+
 ```{r tourism-purpose-stl-mdl, echo = TRUE}
-aus_travel %>% 
-  STL(Trips ~ season(window = "periodic")) %>% 
+aus_travel_stl %>% 
   model(
     hybrid = ETS(trend + remainder) + SNAIVE(season_year)
-  )
+  ) %>% 
+  forecast(h = "3 years") %>% 
+  autoplot(aus_travel_stl)
 ```
+
+---
+class: inverse, top
+
+.sticker-float[![fable](resources/fable.svg)]
+
+<br>
+
+# Flexibility with fable
+
+--
+
+<br>
+
+## Extensibility
 
 ---
 class: inverse
