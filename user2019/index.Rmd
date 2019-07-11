@@ -936,7 +936,7 @@ tsibble::tourism %>%
         arima = ARIMA(Trips),
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>% 
   forecast(h = "3 years")
 ```
 
@@ -958,7 +958,7 @@ tsibble::tourism %>% #<<
         arima = ARIMA(Trips),
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>% 
   forecast(h = "3 years")
 ```
 
@@ -982,7 +982,7 @@ tsibble::tourism %>%
         arima = ARIMA(Trips),
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>% 
   forecast(h = "3 years")
 ```
 
@@ -1006,7 +1006,7 @@ tsibble::tourism %>%
         arima = ARIMA(Trips), #<<
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>% 
   forecast(h = "3 years")
 ```
 
@@ -1030,7 +1030,7 @@ tsibble::tourism %>%
         arima = ARIMA(Trips),
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)), #<<
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% #<<
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>% 
   forecast(h = "3 years")
 ```
 
@@ -1054,7 +1054,7 @@ tsibble::tourism %>%
         arima = ARIMA(Trips),
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)), 
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% #<<
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>% #<<
   forecast(h = "3 years")
 ```
 
@@ -1078,7 +1078,7 @@ tsibble::tourism %>%
         arima = ARIMA(Trips),
         fasster = fasster::fasster(Trips ~ season("year") + poly(2)), 
         prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>%
+  mutate(combn = (ets_n + ets_a + arima + fasster)/4) %>%
   forecast(h = "3 years") #<<
 ```
 
