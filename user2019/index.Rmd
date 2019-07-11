@@ -15,6 +15,7 @@ output:
       highlightLines: true
       countIncrementalSlides: false 
       beforeInit: ["./libs/jquery/jquery.min.js", "./libs/slides.js"]
+      slideNumberFormat: "%current%"
 ---
 class: inverse
 
@@ -136,6 +137,24 @@ class: center
 ## [tidyverts.org](http://www.tidyverts.org)
 ]
 
+---
+class: center
+
+## Forecasting with the tidyverts
+
+.sticker[![fable](resources/fable.svg)]
+
+.sticker[![tsibbledata](resources/tsibbledata.svg)]
+.sticker[![feasts](resources/feasts.svg)]
+.sticker[![tsibble](resources/tsibble.svg)]
+
+## [tidyverts.org](http://www.tidyverts.org)
+
+.animated.fadeIn[
+.sticker-hint[
+(see me later for some stickers!)
+]
+]
 
 ---
 
@@ -559,14 +578,24 @@ class: inverse, top
 
 <br>
 
-# Flexibility with fable
+.larger[
+# Flexibility with...
+]
 
 --
 
 <br>
-
+.center[
+.larger[
 ## Combination forecasting
+]
 
+(models are better when they work together)*
+]
+
+.small-print[
+\* Most of the time, performance improvements not guaranteed! :)
+]
 ---
 
 class: top
@@ -682,7 +711,7 @@ class: top
 
 # Hybrid forecasting
 
-### Combination of forecasts from decomposed components
+### Combining forecasts of decomposed components
 
 --
 
@@ -706,7 +735,7 @@ class: top
 
 # Hybrid forecasting
 
-### Combination of forecasts from decomposed components
+### Combining forecasts of decomposed components
 
 .left-code[
 ```{r tourism-purpose-stl-plot-recall, echo = TRUE, eval = FALSE}
@@ -718,7 +747,7 @@ aus_travel_stl %>%
 ]
 
 .right-plot[
-```{r tourism-purpose-stl-plot-recall-output, echo = FALSE, fig.height=4.5}
+```{r tourism-purpose-stl-plot-recall-output, echo = FALSE, fig.height = 5.8, fig.width=8}
 aus_travel_stl %>% 
   autoplot() + 
   xlab(NULL) + 
@@ -732,7 +761,7 @@ class: top
 
 # Hybrid forecasting
 
-### Combination of forecasts from decomposed components
+### Combining forecasts of decomposed components
 
 .left-code[
 ```{r tourism-purpose-stl-mdl-deseas, echo = TRUE, eval = FALSE}
@@ -748,7 +777,7 @@ aus_travel_stl %>%
 ]
 
 .right-plot[
-```{r tourism-purpose-stl-mdl-deseas-output, ref.label="tourism-purpose-stl-mdl-deseas", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-purpose-stl-mdl-deseas-output, ref.label="tourism-purpose-stl-mdl-deseas", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
 ```
 ]
 
@@ -758,7 +787,7 @@ class: top
 
 # Hybrid forecasting
 
-### Combination of forecasts from decomposed components
+### Combining forecasts of decomposed components
 
 .left-code[
 ```{r tourism-purpose-stl-mdl-seas, echo = TRUE, eval = FALSE}
@@ -766,7 +795,7 @@ aus_travel_stl <- aus_travel %>%
   STL(Trips ~ season(window = "periodic"))
 aus_travel_stl %>% 
   model(
-    deseas = SNAIVE(season_year) #<<
+    seas = SNAIVE(season_year) #<<
   ) %>% 
   forecast(h = "3 years") %>% 
   autoplot(aus_travel_stl)
@@ -774,7 +803,7 @@ aus_travel_stl %>%
 ]
 
 .right-plot[
-```{r tourism-purpose-stl-mdl-seas-output, ref.label="tourism-purpose-stl-mdl-seas", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-purpose-stl-mdl-seas-output, ref.label="tourism-purpose-stl-mdl-seas", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
 ```
 ]
 
@@ -784,7 +813,7 @@ class: top
 
 # Hybrid forecasting
 
-### Combination of forecasts from decomposed components
+### Combining forecasts of decomposed components
 
 .left-code[
 ```{r tourism-purpose-stl-mdl, echo = TRUE, eval = FALSE}
@@ -801,7 +830,7 @@ aus_travel_stl %>%
 ]
 
 .right-plot[
-```{r tourism-purpose-stl-mdl-output, ref.label="tourism-purpose-stl-mdl", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-purpose-stl-mdl-output, ref.label="tourism-purpose-stl-mdl", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
 ```
 ]
 
@@ -812,7 +841,7 @@ class: top
 
 # Hybrid forecasting
 
-### Combination of forecasts from decomposed components
+### Combining forecasts of decomposed components
 
 .left-code[
 ```{r tourism-purpose-stl-mdl-alt, echo = TRUE, eval = FALSE}
@@ -830,9 +859,10 @@ aus_travel %>%
 ]
 
 .right-plot[
-```{r tourism-purpose-stl-mdl-alt-output, ref.label="tourism-purpose-stl-mdl-alt", echo=FALSE, cache=TRUE, fig.height = 6}
+```{r tourism-purpose-stl-mdl-alt-output, ref.label="tourism-purpose-stl-mdl-alt", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
 ```
 ]
+
 
 ---
 class: inverse, top
@@ -841,13 +871,50 @@ class: inverse, top
 
 <br>
 
-# Flexibility with fable
+.larger[
+# Flexibility with...
+]
 
 --
 
 <br>
-
+.center[
+.larger[
 ## Extensibility
+]
+
+(get other people to implement models for you)
+]
+
+---
+class: top
+
+# Adding new models to fable
+
+.pull-left[
+```{r extensible-mdls, echo = TRUE, eval = FALSE}
+library(fasster) #<<
+library(fable.prophet) #<<
+aus_travel %>% 
+ model(
+  fasster = fasster(Trips ~ season("year") + poly(2)), #<<
+  prophet = prophet(Trips ~ season("year")) #<<
+ ) %>% 
+ forecast(h = "3 years") %>% 
+ autoplot(aus_travel, level = NULL)
+```
+]
+.pull-right[
+```{r extensible-mdls-output, ref.label="extensible-mdls", echo=FALSE, cache=TRUE, fig.height = 5.8, fig.width=8}
+```
+]
+
+--
+
+* Direct comparison of new models
+* Unified modelling interface
+* Ensemble and hybrid support
+* and more...
 
 ---
 class: inverse
@@ -862,15 +929,16 @@ class: inverse
 library(fable)
 library(tidyverse)
 tsibble::tourism %>% 
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>% 
-  model(ets_n = ETS(Trips ~ trend("N")),
-        ens_a = ETS(Trips ~ trend("A")), 
-        arima = ARIMA(Trips)) %>% 
+  group_by(Purpose) %>% 
+  summarise(Trips = sum(Trips)) %>% 
+  model(ets_n = ETS(Trips ~ trend("N")), 
+        ets_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips),
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
   mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  reconcile(coherent = min_trace(combn)) %>% 
   forecast(h = "3 years")
 ```
-
 
 ---
 class: inverse
@@ -880,37 +948,17 @@ class: inverse
 .title[Summary `r fa("search", fill = "white")`]
 
 ```{r summary-1, eval = FALSE, echo = TRUE}
-library(fable) #<<
-library(tidyverse) #<<
-tsibble::tourism %>% 
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>% 
-  model(ets_n = ETS(Trips ~ trend("N")),
-        ens_a = ETS(Trips ~ trend("A")), 
-        arima = ARIMA(Trips)) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  reconcile(coherent = min_trace(combn)) %>% 
-  forecast(h = "3 years")
-```
-
-### Integrates seamlessly with the tidyverse.
-
----
-class: inverse
-
-.sticker-float[![fable](resources/fable.svg)]
-
-.title[Summary `r fa("search", fill = "white")`]
-
-```{r summary-2, eval = FALSE, echo = TRUE}
 library(fable)
 library(tidyverse)
 tsibble::tourism %>% #<<
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>% #<<
-  model(ets_n = ETS(Trips ~ trend("N")),
-        ens_a = ETS(Trips ~ trend("A")), 
-        arima = ARIMA(Trips)) %>% 
+  group_by(Purpose) %>%
+  summarise(Trips = sum(Trips)) %>%
+  model(ets_n = ETS(Trips ~ trend("N")), 
+        ets_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips),
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
   mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  reconcile(coherent = min_trace(combn)) %>% 
   forecast(h = "3 years")
 ```
 
@@ -923,20 +971,46 @@ class: inverse
 
 .title[Summary `r fa("search", fill = "white")`]
 
-```{r summary-3, eval = FALSE, echo = TRUE}
+```{r summary-2, eval = FALSE, echo = TRUE}
 library(fable)
-library(tidyverse)
-tsibble::tourism %>%
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>%
-  model(ets_n = ETS(Trips ~ trend("N")), #<<
-        ens_a = ETS(Trips ~ trend("A")), #<<
-        arima = ARIMA(Trips)) %>% #<<
+library(tidyverse) #<<
+tsibble::tourism %>% 
+  group_by(Purpose) %>% #<<
+  summarise(Trips = sum(Trips)) %>% #<<
+  model(ets_n = ETS(Trips ~ trend("N")), 
+        ets_a = ETS(Trips ~ trend("A")), 
+        arima = ARIMA(Trips),
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
   mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  reconcile(coherent = min_trace(combn)) %>% 
   forecast(h = "3 years")
 ```
 
-### Flexible, and succinct model specification.
+### Integrates seamlessly with the tidyverse.
+
+---
+class: inverse
+
+.sticker-float[![fable](resources/fable.svg)]
+
+.title[Summary `r fa("search", fill = "white")`]
+
+```{r summary-3, eval = FALSE, echo = TRUE}
+library(fable)
+library(tidyverse)
+tsibble::tourism %>% 
+  group_by(Purpose) %>%
+  summarise(Trips = sum(Trips)) %>%
+  model(ets_n = ETS(Trips ~ trend("N")), #<<
+        ets_a = ETS(Trips ~ trend("A")), #<<
+        arima = ARIMA(Trips), #<<
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)),
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
+  forecast(h = "3 years")
+```
+
+### Flexible, and succinct formula model specification.
 
 ---
 class: inverse
@@ -948,17 +1022,19 @@ class: inverse
 ```{r summary-4, eval = FALSE, echo = TRUE}
 library(fable)
 library(tidyverse)
-tsibble::tourism %>%
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>%
-  model(ets_n = ETS(Trips ~ trend("N")), 
-        ens_a = ETS(Trips ~ trend("A")), 
-        arima = ARIMA(Trips)) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% #<<
-  reconcile(coherent = min_trace(combn)) %>% 
+tsibble::tourism %>% 
+  group_by(Purpose) %>%
+  summarise(Trips = sum(Trips)) %>%
+  model(ets_n = ETS(Trips ~ trend("N")),
+        ets_a = ETS(Trips ~ trend("A")),
+        arima = ARIMA(Trips),
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)), #<<
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% #<<
+  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
   forecast(h = "3 years")
 ```
 
-### Intuitive interface for model combinations.
+### Extensible by design.
 
 ---
 class: inverse
@@ -970,17 +1046,19 @@ class: inverse
 ```{r summary-5, eval = FALSE, echo = TRUE}
 library(fable)
 library(tidyverse)
-tsibble::tourism %>%
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>%
-  model(ets_n = ETS(Trips ~ trend("N")), 
-        ens_a = ETS(Trips ~ trend("A")), 
-        arima = ARIMA(Trips)) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  reconcile(coherent = min_trace(combn)) %>% #<<
+tsibble::tourism %>% 
+  group_by(Purpose) %>%
+  summarise(Trips = sum(Trips)) %>%
+  model(ets_n = ETS(Trips ~ trend("N")),
+        ets_a = ETS(Trips ~ trend("A")),
+        arima = ARIMA(Trips),
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)), 
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %>% #<<
   forecast(h = "3 years")
 ```
 
-### Flexible forecast reconciliation without changing workflow.
+### Natural interface for model combinations.
 
 ---
 class: inverse
@@ -992,40 +1070,19 @@ class: inverse
 ```{r summary-6, eval = FALSE, echo = TRUE}
 library(fable)
 library(tidyverse)
-tsibble::tourism %>%
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>%
-  model(ets_n = ETS(Trips ~ trend("N")), 
-        ens_a = ETS(Trips ~ trend("A")), 
-        arima = ARIMA(Trips)) %>% 
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% 
-  reconcile(coherent = min_trace(combn)) %>%
+tsibble::tourism %>% 
+  group_by(Purpose) %>%
+  summarise(Trips = sum(Trips)) %>%
+  model(ets_n = ETS(Trips ~ trend("N")),
+        ets_a = ETS(Trips ~ trend("A")),
+        arima = ARIMA(Trips),
+        fasster = fasster::fasster(Trips ~ season("year") + poly(2)), 
+        prophet = fable.prophet::prophet(Trips ~ season("year"))) %>% 
+  mutate(combn = (ets_n + ets_a + arima)/3) %>%
   forecast(h = "3 years") #<<
 ```
 
 ### Distributional forecasts in a data format.
-
-
----
-class: inverse
-
-.sticker-float[![fable](resources/fable.svg)]
-
-.title[Summary `r fa("search", fill = "white")`]
-
-```{r summary-7, eval = FALSE, echo = TRUE}
-library(fable) #<<
-library(tidyverse) #<<
-tsibble::tourism %>% #<<
-  aggregate_key((State / Region) * Purpose, Trips = sum(Trips)) %>% #<<
-  model(ets_n = ETS(Trips ~ trend("N")), #<<
-        ens_a = ETS(Trips ~ trend("A")), #<<
-        arima = ARIMA(Trips)) %>% #<<
-  mutate(combn = (ets_n + ets_a + arima)/3) %>% #<<
-  reconcile(coherent = min_trace(combn)) %>% #<<
-  forecast(h = "3 years") #<<
-```
-
-### Reconciled ensemble forecasts for 425 series.
 
 ---
 class: inverse, center
@@ -1058,8 +1115,6 @@ class: inverse, top
 .sticker-float[![fable](resources/fable.svg)]
 
 .title[Thanks! `r fa("comments", fill = "white")`]
-
-<br>
 
 .larger[
 `r fa("globe", fill = "white")` Learn more: [fable.tidyverts.org](https://fable.tidyverts.org/)

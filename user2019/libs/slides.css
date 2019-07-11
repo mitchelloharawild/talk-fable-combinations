@@ -180,6 +180,23 @@ p, li {
   width: 100%;
 }
 
+.sticker-hint{
+  position: absolute;
+  bottom: 120px;
+  right: -30px;
+  transform: rotate(-45deg);
+}
+
+.small-print{
+  position:absolute;
+  bottom: 10px;
+  left: 30px;
+}
+
+.small-print p{
+  font-size:18px;
+}
+
 .full-width p{
   margin: 3px;
 }
