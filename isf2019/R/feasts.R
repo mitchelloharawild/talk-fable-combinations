@@ -63,7 +63,8 @@ aus_print_media %>%
 
 # Decomposition
 aus_print_media %>% 
-  STL(Turnover) %>% 
+  model(STL(Turnover)) %>%
+  components() %>% 
   autoplot()
 
 vic_print_media %>% 

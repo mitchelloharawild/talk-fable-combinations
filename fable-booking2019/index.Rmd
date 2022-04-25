@@ -307,8 +307,8 @@ class: top
 ## Decompositions
 
 ```{r dcmp-plot, fig.height=5.6, echo = TRUE}
-holiday_aus %>% STL(Trips ~ season(window = "periodic")) %>%
-  autoplot() + theme(legend.position = "right")
+holiday_aus %>% model(STL(Trips ~ season(window = "periodic"))) %>%
+  components() %>% autoplot() + theme(legend.position = "right")
 ```
 
 ---
@@ -564,7 +564,7 @@ fit %>%
   forecast(h = "3 years") %>% 
   autoplot(holiday_aus) + 
   autolayer(augment(fit), .fitted, colour = "blue", linetype = "dashed") + 
-  geom_vline(aes(xintercept = yearquarter("2014 Q4"))) + 
+  geom_vline(xintercept = as.Date(yearquarter("2014 Q4"))) + 
   geom_label(aes(x=x, y=y, label=label), 
                  data = tibble(
                    x = yearquarter(c("2006 Q2", "2016 Q3")), 

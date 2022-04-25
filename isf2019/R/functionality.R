@@ -21,7 +21,8 @@ vic_print_media %>%
 
 # Model combination
 dcmp <- vic_print_media %>% 
-  STL(Turnover ~ trend(window = 13) + season(window = 7))
+  model(STL(Turnover ~ trend(window = 13) + season(window = 7))) %>% 
+  components()
 dcmp %>% 
   model(
     a = NAIVE(seas_adjust),
